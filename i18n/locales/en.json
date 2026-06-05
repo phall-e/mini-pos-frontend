@@ -91,6 +91,26 @@
         "save_failed": "Failed to save unit of measure",
         "delete_failed": "Failed to delete unit of measure"
     },
+    "role": {
+        "title": "Role",
+        "description": "Manage system roles and assigned permissions.",
+        "search_placeholder": "Search role...",
+        "create_title": "Create Role",
+        "edit_title": "Edit Role",
+        "delete_title": "Delete Role",
+        "confirm_delete": "Do you want to delete {name}?",
+        "name_required": "Role name is required",
+        "permission_required": "Please select at least one permission",
+        "select_permissions": "Select permissions",
+        "permissions": "Permissions",
+        "created": "Role created successfully",
+        "updated": "Role updated successfully",
+        "deleted": "Role deleted successfully",
+        "load_failed": "Failed to load role data",
+        "load_permissions_failed": "Failed to load permission options",
+        "save_failed": "Failed to save role",
+        "delete_failed": "Failed to delete role"
+    },
     "menu": {
         "dashboard": "Dashboard",
         "system": "System",

@@ -188,7 +188,7 @@ const menuItems = [
     icon: 'solar:settings-outline',
     children: [
       { index: '/users', label: 'menu.user', icon: 'solar:user-id-outline' },
-      { index: '/roles', label: 'menu.role', icon: 'solar:shield-user-outline' },
+      { index: '/admin/system/role/', label: 'menu.role', icon: 'solar:shield-user-outline' },
     ],
   },
 ]

@@ -38,3 +38,13 @@ select {
 .el-pagination {
   font-family: var(--app-font-family) !important;
 }
+
+.admin-dialog-mask {
+  position: fixed !important;
+  inset: 0 !important;
+  background-color: rgb(15 23 42 / 0.55) !important;
+}
+
+.admin-dialog-mask .el-overlay-dialog {
+  min-height: 100vh;
+}

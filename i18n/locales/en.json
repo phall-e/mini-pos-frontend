@@ -102,6 +102,24 @@
         "save_failed": "Failed to save unit of measure",
         "delete_failed": "Failed to delete unit of measure"
     },
+    "category": {
+        "title": "Category",
+        "description": "Manage product categories used by inventory and sales.",
+        "search_placeholder": "Search category...",
+        "create_title": "Create Category",
+        "edit_title": "Edit Category",
+        "delete_title": "Delete Category",
+        "confirm_delete": "Do you want to delete {code}?",
+        "code_required": "Code is required",
+        "name_en_required": "English name is required",
+        "name_kh_required": "Khmer name is required",
+        "created": "Category created successfully",
+        "updated": "Category updated successfully",
+        "deleted": "Category deleted successfully",
+        "load_failed": "Failed to load category data",
+        "save_failed": "Failed to save category",
+        "delete_failed": "Failed to delete category"
+    },
     "role": {
         "title": "Role",
         "description": "Manage system roles and assigned permissions.",

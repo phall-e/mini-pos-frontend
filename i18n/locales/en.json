@@ -45,6 +45,17 @@
     "scanning": "Scanning",
     "admin_console": "Admin Console",
     "administrator": "Administrator",
+    "profile": {
+        "edit_information": "Edit User Information",
+        "verify_otp": "Verify OTP",
+        "otp": "OTP",
+        "otp_required": "OTP is required",
+        "otp_invalid": "Please enter a valid 6-digit OTP",
+        "new_password_required": "New password is required",
+        "current_user_missing": "Current user information is missing",
+        "password_check_failed": "Failed to verify current password",
+        "otp_verify_failed": "Failed to verify OTP"
+    },
     "dashboard": {
         "products": "Products",
         "manage_product_inventory": "Manage product inventory and pricing.",

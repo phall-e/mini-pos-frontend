@@ -56,7 +56,9 @@ import { ElMessage } from 'element-plus'
 
 definePageMeta({
     middleware: ['otp'],
+    layout: 'auth',
 });
+
 
 const useOtp = useOtpStore();
 const useAuth = useAuthStore();

@@ -45,6 +45,17 @@
     "scanning": "ស្កែន",
     "admin_console": "ផ្ទាំងគ្រប់គ្រង",
     "administrator": "អ្នកគ្រប់គ្រង",
+    "profile": {
+        "edit_information": "កែប្រែព័ត៌មានអ្នកប្រើប្រាស់",
+        "verify_otp": "ផ្ទៀងផ្ទាត់ OTP",
+        "otp": "OTP",
+        "otp_required": "ត្រូវបញ្ចូល OTP",
+        "otp_invalid": "សូមបញ្ចូលលេខ OTP 6 ខ្ទង់",
+        "new_password_required": "ត្រូវបញ្ចូលពាក្យសម្ងាត់ថ្មី",
+        "current_user_missing": "មិនមានព័ត៌មានអ្នកប្រើប្រាស់បច្ចុប្បន្ន",
+        "password_check_failed": "មិនអាចផ្ទៀងផ្ទាត់ពាក្យសម្ងាត់បច្ចុប្បន្នបានទេ",
+        "otp_verify_failed": "មិនអាចផ្ទៀងផ្ទាត់ OTP បានទេ"
+    },
     "dashboard": {
         "products": "ផលិតផល",
         "manage_product_inventory": "គ្រប់គ្រងស្តុកផលិតផល និងតម្លៃ។",

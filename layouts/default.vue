@@ -117,22 +117,16 @@
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="edit-profile">
-                <span class="flex items-center gap-2">
-                  <Icon name="mynaui:user" size="17" />
-                  <span>{{ t('edit_profile') }}</span>
-                </span>
+                <Icon name="mynaui:user" size="17" class="mr-2" />
+                {{ t('edit_profile') }}
               </el-dropdown-item>
               <el-dropdown-item command="change-password">
-                <span class="flex items-center gap-2">
-                  <Icon name="solar:lock-password-outline" size="17" />
-                  <span>{{ t('change_password') }}</span>
-                </span>
+                <Icon name="solar:lock-password-outline" size="17" class="mr-2" />
+                {{ t('change_password') }}
               </el-dropdown-item>
               <el-dropdown-item command="logout">
-                <span class="flex items-center gap-2">
-                  <Icon name="solar:logout-broken" size="17" />
-                  <span>{{ t('logout') }}</span>
-                </span>
+                <Icon name="solar:logout-broken" size="17" class="mr-2" />
+                {{ t('logout') }}
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -426,7 +420,7 @@ const menuItems = [
     icon: 'solar:database-outline',
     children: [
       { index: '/admin/master-data/uom/', label: 'menu.uom', icon: 'solar:ruler-angular-outline' },
-      { index: '/products', label: 'menu.product', icon: 'solar:box-outline' },
+      { index: '/admin/master-data/products/', label: 'menu.product', icon: 'solar:box-outline' },
       { index: '/admin/master-data/categories/', label: 'menu.category', icon: 'solar:folder-with-files-outline' },
       { index: '/suppliers', label: 'menu.supplier', icon: 'solar:delivery-outline' },
     ],

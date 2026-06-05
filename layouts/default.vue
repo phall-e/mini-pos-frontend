@@ -167,6 +167,7 @@ const menuItems = [
     label: 'menu.master_data',
     icon: 'solar:database-outline',
     children: [
+      { index: '/admin/master-data/uom', label: 'menu.uom', icon: 'solar:ruler-angular-outline' },
       { index: '/products', label: 'menu.product', icon: 'solar:box-outline' },
       { index: '/categories', label: 'menu.category', icon: 'solar:folder-with-files-outline' },
       { index: '/suppliers', label: 'menu.supplier', icon: 'solar:delivery-outline' },

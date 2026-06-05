@@ -73,6 +73,24 @@
         "delete_product": "Delete Product",
         "confirm_delete_product": "Do you want to delete {name}?"
     },
+    "uom": {
+        "title": "Unit of Measure",
+        "description": "Manage measurement units used by products and inventory.",
+        "search_placeholder": "Search unit of measure...",
+        "create_title": "Create Unit of Measure",
+        "edit_title": "Edit Unit of Measure",
+        "delete_title": "Delete Unit of Measure",
+        "confirm_delete": "Do you want to delete {code}?",
+        "code_required": "Code is required",
+        "name_en_required": "English name is required",
+        "name_kh_required": "Khmer name is required",
+        "created": "Unit of measure created successfully",
+        "updated": "Unit of measure updated successfully",
+        "deleted": "Unit of measure deleted successfully",
+        "load_failed": "Failed to load unit of measure data",
+        "save_failed": "Failed to save unit of measure",
+        "delete_failed": "Failed to delete unit of measure"
+    },
     "menu": {
         "dashboard": "Dashboard",
         "system": "System",

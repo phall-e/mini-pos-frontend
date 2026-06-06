@@ -85,14 +85,15 @@
 
   const auth = useAuthStore();
 
-  const handleLogin = () => {
-    loading.value = true;
-    try {
-      auth.login(formData.value);
-    } catch (error) {
+  const handleLogin = async () => {
+    loading.value = true
 
+    try {
+      await auth.login(formData.value)
+    } catch (error) {
+      console.error(error)
     } finally {
-      loading.value = false;
+      loading.value = false
     }
   }
 

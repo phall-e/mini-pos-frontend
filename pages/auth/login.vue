@@ -1,11 +1,11 @@
 <template>
   <div class="w-full h-screen flex items-start justify-between">
-    <div class="w-[75%] h-screen">
+    <div class="hidden md:block md:w-[75%] h-screen">
       <img
         class="h-full w-full object-cover"
         src="~/assets/images/login/login-bg.png" alt="Login">
     </div>
-    <div class="w-[25%] h-screen flex items-center justify-center">
+    <div class="w-[100%] md:w-[25%] h-screen flex items-center justify-center">
       <el-form
         label-position="top"
         @submit.prevent="handleLogin"
@@ -66,6 +66,10 @@
   definePageMeta({
       layout: 'auth',
   });
+
+  useSeoMeta({
+    title: 'MINI POS - Login',
+  })
 
   interface FormData {
     username: string;

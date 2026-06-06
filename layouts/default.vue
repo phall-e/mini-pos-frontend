@@ -435,6 +435,14 @@ const menuItems = [
     ],
   },
   {
+    index: 'stocking',
+    label: 'menu.stocking',
+    icon: 'solar:box-minimalistic-outline',
+    children: [
+      { index: '/admin/stocking/stock/', label: 'menu.stock', icon: 'solar:box-outline' },
+    ],
+  },
+  {
     index: 'sales',
     label: 'menu.saling',
     icon: 'solar:cart-large-2-outline',

@@ -65,3 +65,8 @@ select {
 .dropzone-delete-confirm {
   z-index: 100001 !important;
 }
+
+.customer-date-picker-popper,
+.customer-select-popper {
+  z-index: 100001 !important;
+}

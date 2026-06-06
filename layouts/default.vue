@@ -423,6 +423,7 @@ const menuItems = [
       { index: '/admin/master-data/products/', label: 'menu.product', icon: 'solar:box-outline' },
       { index: '/admin/master-data/categories/', label: 'menu.category', icon: 'solar:folder-with-files-outline' },
       { index: '/admin/master-data/vendor/', label: 'menu.vendor', icon: 'solar:delivery-outline' },
+      { index: '/admin/master-data/customer/', label: 'menu.customer', icon: 'solar:users-group-rounded-outline' },
     ],
   },
   {
@@ -431,7 +432,6 @@ const menuItems = [
     icon: 'solar:cart-large-2-outline',
     children: [
       { index: '/sales', label: 'menu.sale', icon: 'solar:bill-list-outline' },
-      { index: '/customers', label: 'menu.customer', icon: 'solar:users-group-rounded-outline' },
     ],
   },
   {

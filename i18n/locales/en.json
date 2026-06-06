@@ -222,6 +222,26 @@
         "save_failed": "Failed to save stock",
         "delete_failed": "Failed to delete stock"
     },
+    "stock_adjustment": {
+        "title": "Stock Adjustment",
+        "description": "Manage stock adjustments, attachments, and adjusted quantities.",
+        "search_placeholder": "Search stock adjustment...",
+        "create_title": "Create Stock Adjustment",
+        "edit_title": "Edit Stock Adjustment",
+        "delete_title": "Delete Stock Adjustment",
+        "confirm_delete": "Do you want to delete stock adjustment for {product}?",
+        "select_product": "Select product",
+        "adjustment_date_required": "Adjustment date is required",
+        "product_required": "Product is required",
+        "quantity_required": "Quantity is required",
+        "created": "Stock adjustment created successfully",
+        "updated": "Stock adjustment updated successfully",
+        "deleted": "Stock adjustment deleted successfully",
+        "load_failed": "Failed to load stock adjustment data",
+        "load_products_failed": "Failed to load product options",
+        "save_failed": "Failed to save stock adjustment",
+        "delete_failed": "Failed to delete stock adjustment"
+    },
     "customer": {
         "title": "Customer",
         "description": "Manage customer information, profile images, and attachments.",

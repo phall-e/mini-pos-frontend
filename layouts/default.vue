@@ -440,6 +440,7 @@ const menuItems = [
     icon: 'solar:box-minimalistic-outline',
     children: [
       { index: '/admin/stocking/stock/', label: 'menu.stock', icon: 'solar:box-outline' },
+      { index: '/admin/stocking/stock-in/', label: 'menu.stock_in', icon: 'solar:inbox-in-outline' },
       { index: '/admin/stocking/stock-adjustment/', label: 'menu.stock_adjustment', icon: 'solar:tuning-square-outline' },
     ],
   },

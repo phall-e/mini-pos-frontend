@@ -48,3 +48,20 @@ select {
 .admin-dialog-mask .el-overlay-dialog {
   min-height: 100vh;
 }
+
+.dropzone-delete-confirm-overlay {
+  z-index: 99999 !important;
+}
+
+.el-overlay:has(.dropzone-delete-confirm) {
+  z-index: 99999 !important;
+}
+
+.dropzone-delete-confirm-overlay .el-overlay-dialog,
+.el-overlay:has(.dropzone-delete-confirm) .el-overlay-dialog {
+  z-index: 100000 !important;
+}
+
+.dropzone-delete-confirm {
+  z-index: 100001 !important;
+}

@@ -427,6 +427,14 @@ const menuItems = [
     ],
   },
   {
+    index: 'purchasing',
+    label: 'menu.purchasing',
+    icon: 'solar:cart-large-minimalistic-outline',
+    children: [
+      { index: '/admin/purchasing/purchase-order/', label: 'menu.purchase_order', icon: 'solar:clipboard-list-outline' },
+    ],
+  },
+  {
     index: 'sales',
     label: 'menu.saling',
     icon: 'solar:cart-large-2-outline',

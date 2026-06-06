@@ -67,6 +67,7 @@ select {
 }
 
 .customer-date-picker-popper,
-.customer-select-popper {
+.customer-select-popper,
+.purchase-order-select-popper {
   z-index: 100001 !important;
 }

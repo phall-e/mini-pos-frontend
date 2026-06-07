@@ -449,7 +449,7 @@ const menuItems = [
     label: 'menu.saling',
     icon: 'solar:cart-large-2-outline',
     children: [
-      { index: '/sales', label: 'menu.sale', icon: 'solar:bill-list-outline' },
+      { index: '/admin/saling/sale/', label: 'menu.sale', icon: 'solar:bill-list-outline' },
     ],
   },
   {

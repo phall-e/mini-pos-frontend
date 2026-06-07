@@ -71,6 +71,7 @@ select {
 .purchase-order-select-popper,
 .stock-select-popper,
 .stock-in-popper,
-.stock-adjustment-popper {
+.stock-adjustment-popper,
+.sale-popper {
   z-index: 100001 !important;
 }

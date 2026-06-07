@@ -57,6 +57,8 @@
         "otp_verify_failed": "Failed to verify OTP"
     },
     "dashboard": {
+        "total_saling": "Total Saling",
+        "total_expense": "Total Expense",
         "products": "Products",
         "manage_product_inventory": "Manage product inventory and pricing.",
         "total_products": "Total Products",

@@ -57,6 +57,8 @@
         "otp_verify_failed": "មិនអាចផ្ទៀងផ្ទាត់ OTP បានទេ"
     },
     "dashboard": {
+        "total_saling": "ការលក់",
+        "total_expense": "ការចំណាយ",
         "products": "ផលិតផល",
         "manage_product_inventory": "គ្រប់គ្រងស្តុកផលិតផល និងតម្លៃ។",
         "total_products": "ផលិតផលសរុប",

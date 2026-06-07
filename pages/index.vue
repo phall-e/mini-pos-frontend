@@ -1,347 +1,557 @@
 <template>
   <section class="space-y-5">
-    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
       <div
         v-for="item in summaryCards"
         :key="item.label"
         class="rounded-md border border-slate-200 bg-white p-4"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm text-slate-500">{{ item.label }}</p>
-            <p class="mt-2 text-2xl font-semibold text-slate-900">{{ item.value }}</p>
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="truncate text-sm text-slate-500">{{ item.label }}</p>
+            <p class="mt-2 text-2xl font-semibold text-slate-900">{{ formatNumber(item.value) }}</p>
           </div>
-          <span class="flex h-10 w-10 items-center justify-center rounded-md" :class="item.iconClass">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md" :class="item.iconClass">
             <Icon :name="item.icon" size="22" />
           </span>
         </div>
       </div>
     </div>
 
-    <div class="rounded-md border border-slate-200 bg-white">
-      <div class="flex flex-col gap-3 border-b border-slate-200 p-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h2 class="text-base font-semibold text-slate-900">{{ t('dashboard.products') }}</h2>
-          <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.manage_product_inventory') }}</p>
+    <!-- <div class="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(360px,0.95fr)]"> -->
+      <div class="rounded-md border border-slate-200 bg-white">
+        <div class="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-base font-semibold text-slate-900">Sale Summary</h2>
+            <p class="mt-1 text-sm text-slate-500">Monthly sale amount and quantity</p>
+          </div>
+          <el-button :loading="loading" @click="loadDashboard">
+            <Icon name="solar:refresh-outline" size="17" />
+            <span class="ml-1">Refresh</span>
+          </el-button>
         </div>
 
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <el-input
-            v-model="search"
-            clearable
-            :placeholder="t('dashboard.search_products')"
-            class="sm:!w-[260px]"
+        <div v-loading="loading" class="h-[360px] p-4">
+          <canvas ref="saleChartRef" aria-label="Sale summary chart" />
+          <div
+            v-if="!loading && !dashboard.saleChart.length"
+            class="flex h-full items-center justify-center text-sm text-slate-400"
           >
-            <template #prefix>
-              <Icon name="solar:magnifer-outline" />
-            </template>
-          </el-input>
-          <el-button type="primary" @click="openCreateDialog">
-            <Icon name="solar:add-circle-outline" size="18" />
-            <span class="ml-1">{{ t('create') }}</span>
-          </el-button>
+            {{ t('no_data') }}
+          </div>
         </div>
       </div>
 
-      <el-table
-        :data="paginatedProducts"
-        stripe
-        class="w-full"
-        row-key="id"
-      >
-        <el-table-column prop="sku" :label="t('dashboard.sku')" width="130" />
-        <el-table-column prop="name" :label="t('dashboard.product_name')" min-width="220" />
-        <el-table-column prop="category" :label="t('dashboard.category')" min-width="160" />
-        <el-table-column prop="stock" :label="t('dashboard.stock')" width="120" align="right" />
-        <el-table-column prop="price" :label="t('dashboard.price')" width="140" align="right">
-          <template #default="{ row }">
-            ${{ row.price.toFixed(2) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" :label="t('dashboard.status')" width="130">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 'Active' ? 'success' : 'info'">
-              {{ t(row.status === 'Active' ? 'active' : 'inactive') }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column :label="t('dashboard.action')" fixed="right" width="140" align="center">
-          <template #default="{ row }">
-            <div class="flex items-center justify-center gap-2">
-              <el-tooltip :content="t('edit')" placement="top">
-                <el-button type="success" circle @click="openEditDialog(row)">
-                  <Icon name="solar:pen-2-outline" size="17" />
-                </el-button>
-              </el-tooltip>
-              <el-tooltip :content="t('delete')" placement="top">
-                <el-button type="danger" circle @click="deleteProduct(row)">
-                  <Icon name="solar:trash-bin-trash-outline" size="17" />
-                </el-button>
-              </el-tooltip>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <div class="flex flex-col gap-3 border-t border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-center gap-2 text-sm text-slate-600">
-          <span>{{ t('dashboard.rows') }}</span>
-          <el-select v-model="pageSize" class="!w-[88px]" @change="page = 1">
-            <el-option
-              v-for="size in pageSizes"
-              :key="size"
-              :label="size"
-              :value="size"
-            />
-          </el-select>
-          <span>{{ t('total') }}: {{ filteredProducts.length }}</span>
+      <!-- <div class="rounded-md border border-slate-200 bg-white">
+        <div class="border-b border-slate-200 p-4">
+          <h2 class="text-base font-semibold text-slate-900">{{ t('dashboard.low_stock') }}</h2>
+          <p class="mt-1 text-sm text-slate-500">Products at or below minimum stock</p>
         </div>
 
-        <el-pagination
-          v-model:current-page="page"
-          v-model:page-size="pageSize"
-          background
-          layout="prev, pager, next"
-          :total="filteredProducts.length"
-        />
+        <el-table
+          v-loading="loading"
+          :data="dashboard.lowStocks"
+          stripe
+          height="360"
+          row-key="stockId"
+        >
+          <template #empty>{{ t('no_data') }}</template>
+          <el-table-column :label="t('columns.product_name')" min-width="220">
+            <template #default="{ row }">
+              <p class="font-medium text-slate-900">{{ displayProductName(row) }}</p>
+              <p class="text-xs text-slate-500">{{ row.productCode }}</p>
+            </template>
+          </el-table-column>
+          <el-table-column :label="t('columns.stock_onhand')" width="130" align="right">
+            <template #default="{ row }">
+              <span :class="row.currentStock <= row.minStock ? 'font-semibold text-rose-600' : 'text-slate-700'">
+                {{ formatNumber(row.currentStock) }}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="t('columns.min_stock')" width="120" align="right">
+            <template #default="{ row }">{{ formatNumber(row.minStock) }}</template>
+          </el-table-column>
+        </el-table>
+      </div> -->
+    <!-- </div> -->
+
+    <div class="grid gap-5 lg:grid-cols-2">
+      <div class="rounded-md border border-slate-200 bg-white">
+        <div class="border-b border-slate-200 p-4">
+          <h2 class="text-base font-semibold text-slate-900">Purchase Order Status</h2>
+          <p class="mt-1 text-sm text-slate-500">Purchase orders grouped by status</p>
+        </div>
+        <div v-loading="loading" class="h-[320px] p-4">
+          <canvas ref="purchaseOrderStatusChartRef" aria-label="Purchase order status chart" />
+          <div
+            v-if="!loading && !dashboard.purchaseOrderStatusSummary.length"
+            class="flex h-full items-center justify-center text-sm text-slate-400"
+          >
+            {{ t('no_data') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-md border border-slate-200 bg-white">
+        <div class="border-b border-slate-200 p-4">
+          <h2 class="text-base font-semibold text-slate-900">Sale Status</h2>
+          <p class="mt-1 text-sm text-slate-500">Sales grouped by status</p>
+        </div>
+        <div v-loading="loading" class="h-[320px] p-4">
+          <canvas ref="saleStatusChartRef" aria-label="Sale status chart" />
+          <div
+            v-if="!loading && !dashboard.saleStatusSummary.length"
+            class="flex h-full items-center justify-center text-sm text-slate-400"
+          >
+            {{ t('no_data') }}
+          </div>
+        </div>
       </div>
     </div>
 
-    <el-dialog
-      v-model="dialogVisible"
-      :title="editingProduct ? t('dashboard.edit_product') : t('dashboard.create_product')"
-      width="520px"
-      align-center
-      append-to-body
-      modal-class="admin-dialog-mask"
-    >
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-position="top"
-      >
-        <el-form-item :label="t('dashboard.sku')" prop="sku">
-          <el-input v-model="form.sku" placeholder="PRD-000" />
-        </el-form-item>
-        <el-form-item :label="t('dashboard.product_name')" prop="name">
-          <el-input v-model="form.name" :placeholder="t('dashboard.product_name')" />
-        </el-form-item>
-        <div class="grid gap-3 sm:grid-cols-2">
-          <el-form-item :label="t('dashboard.category')" prop="category">
-            <el-select v-model="form.category" class="w-full" :placeholder="t('dashboard.select_category')">
-              <el-option label="Beverage" value="Beverage" />
-              <el-option label="Bakery" value="Bakery" />
-              <el-option label="Grocery" value="Grocery" />
-              <el-option label="Stationery" value="Stationery" />
-            </el-select>
-          </el-form-item>
-          <el-form-item :label="t('dashboard.status')" prop="status">
-            <el-select v-model="form.status" class="w-full">
-              <el-option :label="t('active')" value="Active" />
-              <el-option :label="t('inactive')" value="Inactive" />
-            </el-select>
-          </el-form-item>
-        </div>
-        <div class="grid gap-3 sm:grid-cols-2">
-          <el-form-item :label="t('dashboard.stock')" prop="stock">
-            <el-input-number v-model="form.stock" :min="0" class="!w-full" />
-          </el-form-item>
-          <el-form-item :label="t('dashboard.price')" prop="price">
-            <el-input-number v-model="form.price" :min="0" :precision="2" class="!w-full" />
-          </el-form-item>
-        </div>
-      </el-form>
+    <div class="rounded-md border border-slate-200 bg-white">
+      <div class="border-b border-slate-200 p-4">
+        <h2 class="text-base font-semibold text-slate-900">Low Stock Movement</h2>
+        <p class="mt-1 text-sm text-slate-500">Stock movement totals for products below threshold</p>
+      </div>
 
-      <template #footer>
-        <el-button @click="dialogVisible = false">{{ t('cancel') }}</el-button>
-        <el-button type="primary" @click="saveProduct">
-          {{ t('save') }}
-        </el-button>
-      </template>
-    </el-dialog>
+      <el-table
+        v-loading="loading"
+        :data="dashboard.lowStocks"
+        stripe
+        class="w-full"
+        row-key="stockId"
+      >
+        <template #empty>{{ t('no_data') }}</template>
+        <el-table-column prop="productCode" :label="t('columns.code')" min-width="140" />
+        <el-table-column :label="t('columns.product_name')" min-width="260">
+          <template #default="{ row }">{{ displayProductName(row) }}</template>
+        </el-table-column>
+        <el-table-column :label="t('columns.min_stock')" min-width="130" align="right">
+          <template #default="{ row }">{{ formatNumber(row.minStock) }}</template>
+        </el-table-column>
+        <el-table-column :label="t('columns.stock_onhand')" min-width="140" align="right">
+          <template #default="{ row }">
+            <el-tag :type="row.currentStock <= row.minStock ? 'danger' : 'warning'">
+              {{ formatNumber(row.currentStock) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('columns.stock_in')" min-width="120" align="right">
+          <template #default="{ row }">{{ formatNumber(row.stockIn) }}</template>
+        </el-table-column>
+        <el-table-column :label="t('columns.stock_out')" min-width="120" align="right">
+          <template #default="{ row }">{{ formatNumber(row.stockOut) }}</template>
+        </el-table-column>
+        <el-table-column :label="t('columns.stock_adjustment')" min-width="170" align="right">
+          <template #default="{ row }">{{ formatNumber(row.stockAdjustment) }}</template>
+        </el-table-column>
+      </el-table>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, FormRules } from 'element-plus'
+import {
+  BarController,
+  BarElement,
+  CategoryScale,
+  Chart,
+  ArcElement,
+  DoughnutController,
+  Legend,
+  LinearScale,
+  Tooltip,
+} from 'chart.js'
 
-interface Product {
-  id: number
-  sku: string
-  name: string
-  category: string
-  stock: number
-  price: number
-  status: 'Active' | 'Inactive'
+interface DashboardSummary {
+  totalUser: number
+  totalVendor: number
+  totalCustomer: number
+  totalCategory: number
+  totalProduct: number
+  totalSaling: number
+  totalExpense: number
+}
+
+interface SaleChartItem {
+  label: string
+  month: number
+  totalSales: number
+  totalQuantity: number
+  totalAmount: number
+}
+
+interface LowStockItem {
+  stockId: number
+  productId: number
+  productCode: string
+  productNameEn: string
+  productNameKh: string
+  minStock: number
+  currentStock: number
+  stockAdjustment: number
+  stockIn: number
+  stockOut: number
+}
+
+interface StatusSummaryItem {
+  status: string
+  total: number
+}
+
+interface DashboardPayload {
+  summary: DashboardSummary
+  saleChart: SaleChartItem[]
+  lowStocks: LowStockItem[]
+  purchaseOrderStatusSummary: StatusSummaryItem[]
+  saleStatusSummary: StatusSummaryItem[]
+}
+
+type DashboardResponse = DashboardPayload | {
+  payload?: Partial<DashboardPayload>
 }
 
 definePageMeta({
   title: 'Dashboard',
 })
 
-const breadcrumbStore = useBreadcrumbStore()
-const { t } = useI18n()
+Chart.register(ArcElement, BarController, BarElement, CategoryScale, DoughnutController, LinearScale, Tooltip, Legend)
 
-watchEffect(() => {
-  breadcrumbStore.setPageTitle(t('menu.dashboard'))
-  breadcrumbStore.setBreadcrumbs([t('menu.dashboard'), t('dashboard.products')])
+const endpoint = 'admin/dashboard'
+const breadcrumbStore = useBreadcrumbStore()
+const { t, locale } = useI18n()
+
+const loading = ref(false)
+const saleChartRef = ref<HTMLCanvasElement>()
+const purchaseOrderStatusChartRef = ref<HTMLCanvasElement>()
+const saleStatusChartRef = ref<HTMLCanvasElement>()
+let saleChart: Chart<'bar'> | null = null
+let purchaseOrderStatusChart: Chart<'doughnut'> | null = null
+let saleStatusChart: Chart<'doughnut'> | null = null
+
+const emptySummary = (): DashboardSummary => ({
+  totalUser: 0,
+  totalVendor: 0,
+  totalCustomer: 0,
+  totalCategory: 0,
+  totalProduct: 0,
+  totalSaling: 0,
+  totalExpense: 0,
 })
 
-const products = ref<Product[]>([
-  { id: 1, sku: 'PRD-001', name: 'Arabica Coffee Beans', category: 'Beverage', stock: 82, price: 12.5, status: 'Active' },
-  { id: 2, sku: 'PRD-002', name: 'Brown Sugar Milk Tea', category: 'Beverage', stock: 44, price: 3.25, status: 'Active' },
-  { id: 3, sku: 'PRD-003', name: 'Butter Croissant', category: 'Bakery', stock: 18, price: 2.75, status: 'Active' },
-  { id: 4, sku: 'PRD-004', name: 'Thermal Receipt Paper', category: 'Stationery', stock: 120, price: 1.1, status: 'Active' },
-  { id: 5, sku: 'PRD-005', name: 'Organic Honey 500g', category: 'Grocery', stock: 26, price: 8.4, status: 'Active' },
-  { id: 6, sku: 'PRD-006', name: 'Imported Pasta 1kg', category: 'Grocery', stock: 9, price: 4.9, status: 'Inactive' },
-  { id: 7, sku: 'PRD-007', name: 'Chocolate Muffin', category: 'Bakery', stock: 31, price: 2.35, status: 'Active' },
-  { id: 8, sku: 'PRD-008', name: 'Mineral Water Pack', category: 'Beverage', stock: 66, price: 5.5, status: 'Active' },
-  { id: 9, sku: 'PRD-009', name: 'Barcode Label Roll', category: 'Stationery', stock: 14, price: 6.75, status: 'Active' },
-  { id: 10, sku: 'PRD-010', name: 'Green Tea Powder', category: 'Beverage', stock: 21, price: 9.2, status: 'Inactive' },
-  { id: 11, sku: 'PRD-011', name: 'Almond Cookies', category: 'Bakery', stock: 38, price: 4.15, status: 'Active' },
-])
+const dashboard = reactive<DashboardPayload>({
+  summary: emptySummary(),
+  saleChart: [],
+  lowStocks: [],
+  purchaseOrderStatusSummary: [],
+  saleStatusSummary: [],
+})
 
 const summaryCards = computed(() => [
   {
-    label: t('dashboard.total_products'),
-    value: products.value.length,
-    icon: 'solar:box-outline',
-    iconClass: 'bg-amber-100 text-amber-700',
+    label: t('dashboard.total_saling'),
+    value: dashboard.summary.totalSaling,
+    icon: 'solar:cart-large-2-outline',
+    iconClass: 'bg-cyan-100 text-cyan-700',
   },
   {
-    label: t('dashboard.active_items'),
-    value: products.value.filter(item => item.status === 'Active').length,
-    icon: 'solar:check-circle-outline',
+    label: t('dashboard.total_expense'),
+    value: dashboard.summary.totalExpense,
+    icon: 'solar:bill-list-outline',
+    iconClass: 'bg-orange-100 text-orange-700',
+  },
+  {
+    label: t('menu.user'),
+    value: dashboard.summary.totalUser,
+    icon: 'solar:user-id-outline',
+    iconClass: 'bg-sky-100 text-sky-700',
+  },
+  {
+    label: t('menu.vendor'),
+    value: dashboard.summary.totalVendor,
+    icon: 'solar:delivery-outline',
+    iconClass: 'bg-violet-100 text-violet-700',
+  },
+  {
+    label: t('menu.customer'),
+    value: dashboard.summary.totalCustomer,
+    icon: 'solar:users-group-rounded-outline',
     iconClass: 'bg-emerald-100 text-emerald-700',
   },
   {
-    label: t('dashboard.low_stock'),
-    value: products.value.filter(item => item.stock < 20).length,
-    icon: 'solar:danger-triangle-outline',
-    iconClass: 'bg-rose-100 text-rose-700',
+    label: t('dashboard.category'),
+    value: dashboard.summary.totalCategory,
+    icon: 'solar:widget-5-outline',
+    iconClass: 'bg-amber-100 text-amber-700',
   },
   {
-    label: t('dashboard.inventory_value'),
-    value: `$${products.value.reduce((sum, item) => sum + item.stock * item.price, 0).toFixed(0)}`,
-    icon: 'solar:wallet-money-outline',
-    iconClass: 'bg-sky-100 text-sky-700',
+    label: t('menu.product'),
+    value: dashboard.summary.totalProduct,
+    icon: 'solar:box-outline',
+    iconClass: 'bg-rose-100 text-rose-700',
   },
 ])
 
-const search = ref('')
-const page = ref(1)
-const pageSize = ref(10)
-const pageSizes = [10, 20, 50]
-
-const filteredProducts = computed(() => {
-  const keyword = search.value.trim().toLowerCase()
-
-  if (!keyword) return products.value
-
-  return products.value.filter(item =>
-    [item.sku, item.name, item.category, item.status]
-      .some(value => value.toLowerCase().includes(keyword))
-  )
+watchEffect(() => {
+  breadcrumbStore.setPageTitle(t('menu.dashboard'))
+  breadcrumbStore.setBreadcrumbs([t('menu.dashboard')])
 })
 
-const paginatedProducts = computed(() => {
-  const start = (page.value - 1) * pageSize.value
-
-  return filteredProducts.value.slice(start, start + pageSize.value)
-})
-
-watch(search, () => {
-  page.value = 1
-})
-
-const formRef = ref<FormInstance>()
-const dialogVisible = ref(false)
-const editingProduct = ref<Product | null>(null)
-
-const emptyForm = (): Omit<Product, 'id'> => ({
-  sku: '',
-  name: '',
-  category: '',
-  stock: 0,
-  price: 0,
-  status: 'Active',
-})
-
-const form = reactive(emptyForm())
-
-const rules = computed<FormRules>(() => ({
-  sku: [{ required: true, message: t('dashboard.sku_required'), trigger: 'blur' }],
-  name: [{ required: true, message: t('dashboard.product_name_required'), trigger: 'blur' }],
-  category: [{ required: true, message: t('dashboard.category_required'), trigger: 'change' }],
-}))
-
-const resetForm = (value = emptyForm()) => {
-  Object.assign(form, value)
-  nextTick(() => formRef.value?.clearValidate())
+const formatNumber = (value: number) => {
+  return new Intl.NumberFormat(locale.value, {
+    maximumFractionDigits: 2,
+  }).format(Number(value ?? 0))
 }
 
-const openCreateDialog = () => {
-  editingProduct.value = null
-  resetForm()
-  dialogVisible.value = true
+const formatAmount = (value: number) => {
+  return new Intl.NumberFormat(locale.value, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number(value ?? 0))
 }
 
-const openEditDialog = (product: Product) => {
-  editingProduct.value = product
-  resetForm(product)
-  dialogVisible.value = true
+const displayProductName = (item: LowStockItem) => {
+  return item.productNameEn || item.productNameKh || item.productCode || String(item.productId)
 }
 
-const saveProduct = async () => {
-  await formRef.value?.validate((valid) => {
-    if (!valid) return
+const normalizeDashboard = (response: DashboardResponse): DashboardPayload => {
+  const payload = 'payload' in response ? response.payload : response
 
-    if (editingProduct.value) {
-      Object.assign(editingProduct.value, form)
-      useMessage(t('dashboard.product_updated'))
-    } else {
-      products.value.unshift({
-        id: Date.now(),
-        ...form,
-      })
-      page.value = 1
-      useMessage(t('dashboard.product_created'))
-    }
+  return {
+    summary: {
+      ...emptySummary(),
+      ...(payload?.summary ?? {}),
+    },
+    saleChart: payload?.saleChart ?? [],
+    lowStocks: payload?.lowStocks ?? [],
+    purchaseOrderStatusSummary: payload?.purchaseOrderStatusSummary ?? [],
+    saleStatusSummary: payload?.saleStatusSummary ?? [],
+  }
+}
 
-    dialogVisible.value = false
+const renderSaleChart = () => {
+  if (!saleChartRef.value) return
+
+  saleChart?.destroy()
+  saleChart = null
+
+  if (!dashboard.saleChart.length) return
+
+  saleChart = new Chart(saleChartRef.value, {
+    type: 'bar',
+    data: {
+      labels: dashboard.saleChart.map(item => item.label),
+      datasets: [
+        {
+          label: 'Total Amount',
+          data: dashboard.saleChart.map(item => Number(item.totalAmount ?? 0)),
+          backgroundColor: 'rgba(37, 99, 235, 0.72)',
+          borderColor: 'rgb(37, 99, 235)',
+          borderWidth: 1,
+          borderRadius: 4,
+          yAxisID: 'amount',
+        },
+        {
+          label: 'Total Quantity',
+          data: dashboard.saleChart.map(item => Number(item.totalQuantity ?? 0)),
+          backgroundColor: 'rgba(16, 185, 129, 0.64)',
+          borderColor: 'rgb(5, 150, 105)',
+          borderWidth: 1,
+          borderRadius: 4,
+          yAxisID: 'quantity',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            boxWidth: 12,
+            usePointStyle: true,
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const label = context.dataset.label ?? ''
+              const value = Number(context.parsed.y ?? 0)
+
+              return label === 'Total Amount'
+                ? `${label}: ${formatAmount(value)}`
+                : `${label}: ${formatNumber(value)}`
+            },
+          },
+        },
+      },
+      scales: {
+        amount: {
+          beginAtZero: true,
+          position: 'left',
+          ticks: {
+            callback: value => formatAmount(Number(value)),
+          },
+          grid: {
+            color: 'rgba(148, 163, 184, 0.2)',
+          },
+        },
+        quantity: {
+          beginAtZero: true,
+          position: 'right',
+          grid: {
+            drawOnChartArea: false,
+          },
+          ticks: {
+            callback: value => formatNumber(Number(value)),
+          },
+        },
+        x: {
+          grid: {
+            display: false,
+          },
+        },
+      },
+    },
   })
 }
 
-const deleteProduct = async (product: Product) => {
-  try {
-    await ElMessageBox.confirm(
-      t('dashboard.confirm_delete_product', { name: product.name }),
-      t('dashboard.delete_product'),
-      {
-        confirmButtonText: t('delete'),
-        cancelButtonText: t('cancel'),
-        type: 'warning',
-      },
-    )
+const statusColor = (status: string) => {
+  const normalized = status.toLowerCase()
 
-    products.value = products.value.filter(item => item.id !== product.id)
-    useMessage(t('dashboard.product_deleted'))
-  } catch {
-    useMessage(t('delete_canceled'), 'info')
+  if (normalized === 'completed') return 'rgba(16, 185, 129, 0.82)'
+  if (normalized === 'cancelled') return 'rgba(244, 63, 94, 0.82)'
+  if (normalized === 'pending') return 'rgba(245, 158, 11, 0.82)'
+
+  return 'rgba(100, 116, 139, 0.82)'
+}
+
+const renderStatusChart = (
+  canvas: HTMLCanvasElement | undefined,
+  chart: Chart<'doughnut'> | null,
+  items: StatusSummaryItem[],
+  label: string,
+) => {
+  chart?.destroy()
+
+  if (!canvas || !items.length) return null
+
+  const total = items.reduce((sum, item) => sum + Number(item.total ?? 0), 0)
+
+  return new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: items.map(item => item.status),
+      datasets: [
+        {
+          label,
+          data: items.map(item => Number(item.total ?? 0)),
+          backgroundColor: items.map(item => statusColor(item.status)),
+          borderColor: '#ffffff',
+          borderWidth: 2,
+          hoverOffset: 6,
+        },
+      ],
+    },
+    plugins: [{
+      id: `${label.replace(/\s+/g, '-').toLowerCase()}-center-total`,
+      beforeDraw: (chartInstance) => {
+        const { ctx, chartArea } = chartInstance
+        if (!chartArea) return
+
+        const centerX = (chartArea.left + chartArea.right) / 2
+        const centerY = (chartArea.top + chartArea.bottom) / 2
+
+        ctx.save()
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillStyle = '#0f172a'
+        ctx.font = '600 28px sans-serif'
+        ctx.fillText(formatNumber(total), centerX, centerY - 8)
+        ctx.fillStyle = '#64748b'
+        ctx.font = '400 12px sans-serif'
+        ctx.fillText('Total', centerX, centerY + 18)
+        ctx.restore()
+      },
+    }],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            boxWidth: 12,
+            usePointStyle: true,
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const value = Number(context.parsed ?? 0)
+
+              return `${context.label}: ${formatNumber(value)}`
+            },
+          },
+        },
+      },
+    },
+  })
+}
+
+const renderDashboardCharts = () => {
+  renderSaleChart()
+  purchaseOrderStatusChart = renderStatusChart(
+    purchaseOrderStatusChartRef.value,
+    purchaseOrderStatusChart,
+    dashboard.purchaseOrderStatusSummary,
+    'Purchase Orders',
+  )
+  saleStatusChart = renderStatusChart(
+    saleStatusChartRef.value,
+    saleStatusChart,
+    dashboard.saleStatusSummary,
+    'Sales',
+  )
+}
+
+const loadDashboard = async () => {
+  try {
+    loading.value = true
+    const response = await useApi<DashboardResponse>(endpoint, { method: 'get' })
+    const data = normalizeDashboard(response)
+
+    dashboard.summary = data.summary
+    dashboard.saleChart = data.saleChart
+    dashboard.lowStocks = data.lowStocks
+    dashboard.purchaseOrderStatusSummary = data.purchaseOrderStatusSummary
+    dashboard.saleStatusSummary = data.saleStatusSummary
+
+    await nextTick()
+    renderDashboardCharts()
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to load dashboard data'
+    useNotification(message, 'error')
+  } finally {
+    loading.value = false
   }
 }
+
+onMounted(() => {
+  loadDashboard()
+})
+
+onBeforeUnmount(() => {
+  saleChart?.destroy()
+  purchaseOrderStatusChart?.destroy()
+  saleStatusChart?.destroy()
+})
 </script>
-
-<style>
-.admin-dialog-mask {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 3000 !important;
-  background-color: rgb(15 23 42 / 55%) !important;
-}
-
-.admin-dialog-mask .el-overlay-dialog {
-  min-height: 100vh;
-}
-</style>

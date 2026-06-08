@@ -73,6 +73,13 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column :label="t('payment_setting.is_cashed')" min-width="130" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.isCashed ? 'success' : 'info'" effect="plain">
+              {{ row.isCashed ? t('payment_setting.cashed') : t('payment_setting.not_cashed') }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column :label="t('columns.action')" fixed="right" width="140" align="center">
           <template #default="{ row }">
             <div class="flex items-center justify-center gap-2">
@@ -192,6 +199,13 @@
               :inactive-text="t('inactive')"
             />
           </el-form-item>
+          <el-form-item :label="t('payment_setting.is_cashed')" prop="isCashed">
+            <el-switch
+              v-model="form.isCashed"
+              :active-text="t('payment_setting.cashed')"
+              :inactive-text="t('payment_setting.not_cashed')"
+            />
+          </el-form-item>
           <el-form-item :label="t('payment_setting.logo')" prop="logo" class="sm:col-span-2 xl:col-span-3">
             <SingleUpload
               v-model="form.logo"
@@ -251,17 +265,18 @@ interface PaymentSetting {
   id: number
   name: string
   logo?: LogoValue
-  bankAccount: string
-  merchantName: string
-  merchantCity: string
-  amount: number
-  currency: Currency
-  storeLabel: string
-  phoneNumber: string
-  billNumber: string
-  terminalLabel: string
-  merchantCategoryCode: string
+  bankAccount?: string | null
+  merchantName?: string | null
+  merchantCity?: string | null
+  amount?: number | null
+  currency?: Currency | null
+  storeLabel?: string | null
+  phoneNumber?: string | null
+  billNumber?: string | null
+  terminalLabel?: string | null
+  merchantCategoryCode?: string | null
   isActive: boolean
+  isCashed: boolean
 }
 
 interface ListMeta {
@@ -317,31 +332,22 @@ const emptyForm = () => ({
   bankAccount: '',
   merchantName: '',
   merchantCity: '',
-  amount: 0,
-  currency: 'usd' as Currency,
+  amount: undefined as number | undefined,
+  currency: undefined as Currency | undefined,
   storeLabel: '',
   phoneNumber: '',
   billNumber: '',
   terminalLabel: '',
   merchantCategoryCode: '5999',
   isActive: true,
+  isCashed: false,
 })
 
 const form = reactive(emptyForm())
 
 const rules = computed<FormRules>(() => ({
   name: [{ required: true, message: t('payment_setting.name_required'), trigger: 'blur' }],
-  bankAccount: [{ required: true, message: t('payment_setting.bank_account_required'), trigger: 'blur' }],
-  merchantName: [{ required: true, message: t('payment_setting.merchant_name_required'), trigger: 'blur' }],
-  merchantCity: [{ required: true, message: t('payment_setting.merchant_city_required'), trigger: 'blur' }],
-  amount: [{ required: true, type: 'number', min: 0, message: t('payment_setting.amount_required'), trigger: 'blur' }],
-  currency: [{ required: true, message: t('payment_setting.currency_required'), trigger: 'change' }],
-  storeLabel: [{ required: true, message: t('payment_setting.store_label_required'), trigger: 'blur' }],
-  phoneNumber: [{ required: true, message: t('payment_setting.phone_number_required'), trigger: 'blur' }],
-  billNumber: [{ required: true, message: t('payment_setting.bill_number_required'), trigger: 'blur' }],
-  terminalLabel: [{ required: true, message: t('payment_setting.terminal_label_required'), trigger: 'blur' }],
   merchantCategoryCode: [
-    { required: true, message: t('payment_setting.merchant_category_code_required'), trigger: 'blur' },
     { pattern: /^\d{4}$/, message: t('payment_setting.merchant_category_code_invalid'), trigger: ['blur', 'change'] },
   ],
 }))
@@ -449,16 +455,19 @@ const resetForm = (value = emptyForm()) => {
   Object.assign(form, {
     ...emptyForm(),
     ...value,
-    amount: Number(value.amount ?? 0),
-    currency: (value.currency ?? 'usd') as Currency,
+    amount: value.amount == null ? undefined : Number(value.amount),
+    currency: value.currency ?? undefined,
     logo: value.logo ?? null,
-    merchantCategoryCode: value.merchantCategoryCode || '5999',
+    merchantCategoryCode: value.merchantCategoryCode ?? '',
     isActive: value.isActive ?? true,
+    isCashed: value.isCashed ?? false,
   })
   nextTick(() => formRef.value?.clearValidate())
 }
 
-const displayAmount = (amount: number | string, currency: Currency) => {
+const displayAmount = (amount?: number | string | null, currency?: Currency | null) => {
+  if (amount == null || amount === '') return '-'
+
   const value = Number(amount)
 
   if (Number.isNaN(value)) return '-'
@@ -494,6 +503,12 @@ const loadItems = async () => {
 const handleLimitChange = () => {
   params.page = 1
   loadItems()
+}
+
+const optionalText = (value?: string | null) => {
+  const trimmed = String(value ?? '').trim()
+
+  return trimmed || null
 }
 
 const openCreateDialog = () => {
@@ -532,17 +547,18 @@ const submit = async () => {
         body: {
           name: form.name,
           logo: normalizeLogo(form.logo),
-          bankAccount: form.bankAccount,
-          merchantName: form.merchantName,
-          merchantCity: form.merchantCity,
-          amount: form.amount,
-          currency: form.currency,
-          storeLabel: form.storeLabel,
-          phoneNumber: form.phoneNumber,
-          billNumber: form.billNumber,
-          terminalLabel: form.terminalLabel,
-          merchantCategoryCode: form.merchantCategoryCode || '5999',
+          bankAccount: optionalText(form.bankAccount),
+          merchantName: optionalText(form.merchantName),
+          merchantCity: optionalText(form.merchantCity),
+          amount: form.amount ?? null,
+          currency: form.currency ?? null,
+          storeLabel: optionalText(form.storeLabel),
+          phoneNumber: optionalText(form.phoneNumber),
+          billNumber: optionalText(form.billNumber),
+          terminalLabel: optionalText(form.terminalLabel),
+          merchantCategoryCode: optionalText(form.merchantCategoryCode),
           isActive: form.isActive,
+          isCashed: form.isCashed,
         },
       },
     )

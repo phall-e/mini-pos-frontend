@@ -470,6 +470,7 @@ const menuItems = [
     children: [
       { index: '/admin/system/user/', label: 'menu.user', icon: 'solar:user-id-outline' },
       { index: '/admin/system/role/', label: 'menu.role', icon: 'solar:shield-user-outline' },
+      { index: '/admin/system/payment-setting/', label: 'menu.payment_setting', icon: 'solar:card-2-outline' },
     ],
   },
 ]

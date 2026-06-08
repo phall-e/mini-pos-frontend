@@ -36,6 +36,22 @@
         <el-table-column :label="t('menu.customer')" min-width="220">
           <template #default="{ row }">{{ displayCustomer(row.customer, row.customerId) }}</template>
         </el-table-column>
+        <el-table-column :label="t('sale.payment_type')" min-width="190">
+          <template #default="{ row }">
+            <div class="flex items-center gap-2">
+              <div class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-200 bg-slate-50">
+                <img
+                  v-if="paymentTypeLogoUrl(row.paymentType, row.paymentTypeId)"
+                  :src="paymentTypeLogoUrl(row.paymentType, row.paymentTypeId) ?? ''"
+                  :alt="displayPaymentType(row.paymentType, row.paymentTypeId)"
+                  class="h-full w-full object-contain"
+                >
+                <Icon v-else name="solar:card-2-outline" size="16" class="text-slate-400" />
+              </div>
+              <span class="truncate">{{ displayPaymentType(row.paymentType, row.paymentTypeId) }}</span>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column :label="t('columns.status')" min-width="140" align="center">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)">{{ displayStatus(row.status) }}</el-tag>
@@ -222,6 +238,32 @@
                     <el-option v-for="customer in customerOptions" :key="customer.id" :label="customer.name" :value="customer.id" />
                   </el-select>
                 </el-form-item>
+                <el-form-item :label="t('sale.payment_type')" prop="paymentTypeId">
+                  <el-select
+                    v-model="form.paymentTypeId"
+                    filterable
+                    :loading="paymentTypeLoading"
+                    :placeholder="t('sale.select_payment_type')"
+                    :teleported="false"
+                    popper-class="sale-popper"
+                    class="w-full"
+                  >
+                    <el-option v-for="paymentType in paymentTypeOptions" :key="paymentType.id" :label="paymentType.name" :value="paymentType.id">
+                      <div class="flex items-center gap-2">
+                        <div class="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-200 bg-slate-50">
+                          <img
+                            v-if="paymentTypeLogoUrl(paymentType)"
+                            :src="paymentTypeLogoUrl(paymentType) ?? ''"
+                            :alt="paymentType.name"
+                            class="h-full w-full object-contain"
+                          >
+                          <Icon v-else name="solar:card-2-outline" size="14" class="text-slate-400" />
+                        </div>
+                        <span>{{ paymentType.name }}</span>
+                      </div>
+                    </el-option>
+                  </el-select>
+                </el-form-item>
                 <el-form-item :label="t('columns.note')" prop="note">
                   <el-input v-model="form.note" type="textarea" :rows="2" :placeholder="t('columns.note')" />
                 </el-form-item>
@@ -259,7 +301,7 @@
                       </div>
                       <div class="mt-3 grid grid-cols-[1fr_1fr_auto] items-center gap-3">
                         <el-input-number v-model="item.quantity" :min="1" size="small" />
-                        <el-input-number v-model="item.discount" :min="0" :precision="2" :step="1" size="small" />
+                        <el-input-number v-model="item.discount" :min="0" :precision="2" step="any" size="small" />
                         <span class="text-sm font-semibold text-slate-900">{{ formatAmount(getItemTotalAmount(item)) }}</span>
                       </div>
                     </div>
@@ -269,17 +311,26 @@
               </div>
 
               <div class="space-y-2 rounded-md border border-slate-200 bg-white p-3">
+                <div 
+                    v-if="!isCashed"
+                    class="flex items-center justify-center w-full mt-2"
+                  >
+                    <el-image 
+                      v-loading="paymentMethodLoading"
+                      :src="qrImage"
+                    />
+                  </div>
                 <div class="flex items-center justify-between text-sm text-slate-600">
                   <span>{{ t('columns.total_quantity') }}</span>
                   <span>{{ formatNumber(totalQuantity) }}</span>
                 </div>
                 <div class="flex items-center justify-between text-sm text-slate-600">
                   <span>{{ t('columns.total_discount') }}</span>
-                  <span>{{ formatAmount(totalDiscount) }}</span>
+                  <span>$ {{ formatAmount(totalDiscount) }}</span>
                 </div>
                 <div class="flex items-center justify-between text-lg font-semibold text-slate-900">
                   <span>{{ t('columns.grand_total') }}</span>
-                  <span>{{ formatAmount(totalAmount) }}</span>
+                  <span>$ {{ formatAmount(totalAmount) }}</span>
                 </div>
               </div>
 
@@ -310,7 +361,7 @@
             </el-form-item>
           </div>
 
-          <div class="grid gap-4 sm:grid-cols-2">
+          <div class="grid gap-4 sm:grid-cols-3">
             <el-form-item :label="t('menu.customer')" prop="customerId">
               <el-select
                 v-model="form.customerId"
@@ -322,6 +373,32 @@
                 class="w-full"
               >
                 <el-option v-for="customer in customerOptions" :key="customer.id" :label="customer.name" :value="customer.id" />
+              </el-select>
+            </el-form-item>
+            <el-form-item :label="t('sale.payment_type')" prop="paymentTypeId">
+              <el-select
+                v-model="form.paymentTypeId"
+                filterable
+                :loading="paymentTypeLoading"
+                :placeholder="t('sale.select_payment_type')"
+                :teleported="false"
+                popper-class="sale-popper"
+                class="w-full"
+              >
+                <el-option v-for="paymentType in paymentTypeOptions" :key="paymentType.id" :label="paymentType.name" :value="paymentType.id">
+                  <div class="flex items-center gap-2">
+                    <div class="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-200 bg-slate-50">
+                      <img
+                        v-if="paymentTypeLogoUrl(paymentType)"
+                        :src="paymentTypeLogoUrl(paymentType) ?? ''"
+                        :alt="paymentType.name"
+                        class="h-full w-full object-contain"
+                      >
+                      <Icon v-else name="solar:card-2-outline" size="14" class="text-slate-400" />
+                    </div>
+                    <span>{{ paymentType.name }}</span>
+                  </div>
+                </el-option>
               </el-select>
             </el-form-item>
             <el-form-item :label="t('columns.status')" prop="status">
@@ -415,13 +492,13 @@
                   <el-table-column :label="t('columns.unit_price')" min-width="170">
                     <template #default="{ row, $index }">
                       <el-form-item :prop="`items.${$index}.unitPrice`" :rules="itemUnitPriceRules" class="!mb-0">
-                        <el-input-number v-model="row.unitPrice" :min="0" :precision="2" :step="1" class="!w-full" />
+                        <el-input-number v-model="row.unitPrice" :min="0" :precision="2" step="any" class="!w-full" />
                       </el-form-item>
                     </template>
                   </el-table-column>
                   <el-table-column :label="t('columns.discount')" min-width="170">
                     <template #default="{ row }">
-                      <el-input-number v-model="row.discount" :min="0" :precision="2" :step="1" class="!w-full" />
+                      <el-input-number v-model="row.discount" :min="0" :precision="2" step="any" class="!w-full" />
                     </template>
                   </el-table-column>
                   <el-table-column :label="t('columns.total_amount')" min-width="150">
@@ -490,6 +567,10 @@
               <p class="font-medium">{{ displayStatus(printItem.status) }}</p>
             </div>
             <div>
+              <p class="text-xs font-semibold uppercase tracking-normal text-slate-500">{{ t('sale.payment_type') }}</p>
+              <p class="font-medium">{{ displayPaymentType(printItem.paymentType, printItem.paymentTypeId) }}</p>
+            </div>
+            <div>
               <p class="text-xs font-semibold uppercase tracking-normal text-slate-500">Printed At</p>
               <p class="font-medium">{{ printIssuedAt }}</p>
             </div>
@@ -551,6 +632,7 @@
 import type { FormInstance, FormRules } from 'element-plus'
 import DropZone from '~/@core/components/DropZone.vue'
 import logoUrl from '~/assets/images/logo/logo.png'
+import QRCode from "qrcode";
 
 type SaleStatus = 'Pending' | 'Cancelled' | 'Completed'
 
@@ -565,6 +647,7 @@ interface SelectOption {
   unitPrice?: number
   discount?: number
   thumbnail?: ThumbnailValue
+  logo?: ThumbnailValue
 }
 
 interface SelectOptionPayload {
@@ -580,6 +663,7 @@ interface SelectOptionPayload {
   unitPrice?: number
   discount?: number
   thumbnail?: ThumbnailValue
+  logo?: ThumbnailValue
 }
 
 type ThumbnailValue = string | {
@@ -650,6 +734,8 @@ interface Sale {
   status: SaleStatus
   items?: SaleItem[]
   customer?: SelectOption | string | null
+  paymentTypeId?: number
+  paymentType?: SelectOption | string | null
   createdAt?: string | Date | null
 }
 
@@ -696,6 +782,7 @@ const productEndpoint = 'admin/master-data/products'
 const productSelectEndpoint = 'admin/master-data/products/select-options'
 const customerEndpoint = 'admin/master-data/customers/select-options'
 const categoryEndpoint = 'admin/master-data/categories/select-options'
+const paymentTypeEndpoint = 'admin/system/payment-setting/select-options'
 const pageSizes = [10, 20, 50, 100]
 const statusOptions: SaleStatus[] = ['Pending', 'Cancelled', 'Completed']
 
@@ -709,11 +796,13 @@ const printLoadingId = ref<number | null>(null)
 const customerLoading = ref(false)
 const productLoading = ref(false)
 const categoryLoading = ref(false)
+const paymentTypeLoading = ref(false)
 const items = ref<Sale[]>([])
 const customerOptions = ref<SelectOption[]>([])
 const productOptions = ref<SelectOption[]>([])
 const products = ref<Product[]>([])
 const categoryOptions = ref<SelectOption[]>([])
+const paymentTypeOptions = ref<SelectOption[]>([])
 const productSearch = ref('')
 const productCategoryFilter = ref<number | undefined>()
 const meta = reactive<ListMeta>({
@@ -751,6 +840,7 @@ const emptyForm = () => ({
   code: '',
   saleDate: new Date().toISOString().slice(0, 10),
   customerId: undefined as number | undefined,
+  paymentTypeId: undefined as number | undefined,
   note: '',
   attachments: [] as AttachmentFile[],
   status: 'Pending' as SaleStatus,
@@ -782,6 +872,7 @@ const rules = computed<FormRules>(() => ({
   code: [{ required: true, message: t('sale.code_required'), trigger: 'blur' }],
   saleDate: [{ required: true, message: t('sale.sale_date_required'), trigger: 'change' }],
   customerId: [{ required: true, message: t('sale.customer_required'), trigger: 'change' }],
+  paymentTypeId: [{ required: true, message: t('sale.payment_type_required'), trigger: 'change' }],
   status: [{ required: true, message: t('sale.status_required'), trigger: 'change' }],
   items: [{
     type: 'array',
@@ -846,6 +937,7 @@ const normalizeOption = (option: SelectOptionPayload): SelectOption => ({
   unitPrice: typeof option.unitPrice === 'number' ? option.unitPrice : undefined,
   discount: typeof option.discount === 'number' ? option.discount : undefined,
   thumbnail: option.thumbnail ?? null,
+  logo: option.logo ?? null,
 })
 
 const normalizeStatus = (status?: SaleStatus | string | null): SaleStatus => {
@@ -915,6 +1007,14 @@ const displayCustomer = (customer: Sale['customer'], customerId: number | undefi
   if (!customerId) return '-'
 
   return customerOptions.value.find(option => option.id === customerId)?.name ?? String(customerId)
+}
+
+const displayPaymentType = (paymentType: Sale['paymentType'], paymentTypeId?: number) => {
+  if (typeof paymentType === 'string') return paymentType
+  if (paymentType && typeof paymentType === 'object') return paymentType.name ?? paymentType.nameEn ?? paymentType.nameKh ?? paymentType.code ?? String(paymentType.id)
+  if (!paymentTypeId) return '-'
+
+  return paymentTypeOptions.value.find(option => option.id === paymentTypeId)?.name ?? String(paymentTypeId)
 }
 
 const customerOption = (sale: Pick<Sale, 'customer' | 'customerId'>) => {
@@ -1039,9 +1139,21 @@ const itemThumbnail = (item: SaleItem): ThumbnailValue => {
   return productThumbnailById(item.productId)
 }
 
+const paymentTypeLogo = (paymentType?: Sale['paymentType'] | SelectOption, paymentTypeId?: number): ThumbnailValue => {
+  if (paymentType && typeof paymentType === 'object' && paymentType.logo) return paymentType.logo
+  if (!paymentTypeId) return null
+
+  return paymentTypeOptions.value.find(option => option.id === paymentTypeId)?.logo ?? null
+}
+
+const paymentTypeLogoUrl = (paymentType?: Sale['paymentType'] | SelectOption, paymentTypeId?: number) => {
+  return thumbnailUrl(paymentTypeLogo(paymentType, paymentTypeId))
+}
+
 const loadThumbnailPreviews = (saleItems: SaleItem[] = form.items) => {
   productOptions.value.forEach(product => loadThumbnailPreview(product.thumbnail))
   products.value.forEach(product => loadThumbnailPreview(product.thumbnail))
+  paymentTypeOptions.value.forEach(paymentType => loadThumbnailPreview(paymentType.logo))
   saleItems.forEach(item => loadThumbnailPreview(itemThumbnail(item)))
 }
 
@@ -1085,6 +1197,7 @@ const resetForm = (value: Partial<Sale> = emptyForm()) => {
   form.code = value.code ?? ''
   form.saleDate = value.saleDate ? String(value.saleDate).slice(0, 10) : new Date().toISOString().slice(0, 10)
   form.customerId = value.customerId
+  form.paymentTypeId = value.paymentTypeId ?? (value.paymentType && typeof value.paymentType === 'object' ? value.paymentType.id : undefined)
   form.note = value.note ?? ''
   form.attachments = [...(value.attachments ?? value.attachment ?? [])]
   form.status = normalizeStatus(value.status)
@@ -1169,12 +1282,26 @@ const loadCategoryOptions = async () => {
   }
 }
 
+const loadPaymentTypeOptions = async () => {
+  try {
+    paymentTypeLoading.value = true
+    const response = await useApi<RawSelectResponse>(paymentTypeEndpoint, { method: 'get' })
+    paymentTypeOptions.value = selectPayloadItems(response).map(normalizeOption).filter(option => Number.isFinite(option.id))
+    paymentTypeOptions.value.forEach(paymentType => loadThumbnailPreview(paymentType.logo))
+  } catch (error) {
+    useNotification(getErrorMessage(error, t('sale.load_payment_types_failed')), 'error')
+  } finally {
+    paymentTypeLoading.value = false
+  }
+}
+
 const loadSelectOptions = async () => {
   await Promise.all([
     loadCustomerOptions(),
     loadProductOptions(),
     loadProducts(),
     loadCategoryOptions(),
+    loadPaymentTypeOptions(),
   ])
 }
 
@@ -1187,6 +1314,7 @@ const loadItems = async () => {
     )
 
     items.value = response.payload.data ?? []
+    items.value.forEach(item => loadThumbnailPreview(paymentTypeLogo(item.paymentType, item.paymentTypeId)))
     meta.totalItems = response.payload.meta?.totalItems ?? items.value.length
     meta.currentPage = response.payload.meta?.currentPage ?? params.page
     meta.totalPages = response.payload.meta?.totalPages ?? 1
@@ -1281,7 +1409,7 @@ const openEditDialog = async (item: Sale) => {
   resetForm(item)
   dialogVisible.value = true
 
-  if (!customerOptions.value.length || !productOptions.value.length || !products.value.length || !categoryOptions.value.length) {
+  if (!customerOptions.value.length || !productOptions.value.length || !products.value.length || !categoryOptions.value.length || !paymentTypeOptions.value.length) {
     await loadSelectOptions()
   }
 
@@ -1307,6 +1435,7 @@ const printInvoice = async (item: Sale) => {
     printItem.value = response.payload
     printIssuedAt.value = displayCreatedAt(new Date())
     loadThumbnailPreviews(response.payload.items ?? [])
+    loadThumbnailPreview(paymentTypeLogo(response.payload.paymentType, response.payload.paymentTypeId))
 
     await nextTick()
     window.print()
@@ -1342,6 +1471,7 @@ const submit = async () => {
           code: form.code,
           saleDate: form.saleDate,
           customerId: form.customerId,
+          paymentTypeId: form.paymentTypeId,
           note: form.note || null,
           attachments: form.attachments,
           status: form.status,
@@ -1401,7 +1531,177 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('afterprint', clearPrintItem)
-})
+});
+
+const qrImage = ref("");
+
+const qrCodeGenerate =  async (qrStr: string) => {
+  qrImage.value = await QRCode.toDataURL(qrStr, {
+    width: 150,
+       margin: 1,
+      //  color: {
+      //   dark: "#fa1f7e",   // 🔥 QR Code color
+      //    light: "#ffffff00" // transparent background (optional)
+      //  },
+  });
+};
+
+const playSuccessSound = async () => {
+  try {
+    const audio = new Audio('/success-sound.mp3');
+
+    audio.volume = 1;
+
+    await audio.play();
+  } catch (error) {
+    console.error('Failed to play sound', error);
+  }
+};
+
+const isCashed = ref(true);
+const paymentMethodLoading = ref(false);
+const khqr = ref('');
+
+let verifyInterval: ReturnType<typeof setInterval> | null = null;
+let isVerifying = false;
+
+/**
+ * Verify KHQR Payment
+ *
+ * Return:
+ * true  = continue polling
+ * false = payment successful, stop polling
+ */
+const verifyKHQR = async (): Promise<boolean> => {
+  if (!khqr.value) return false;
+
+  try {
+    const response = await useApi<any>(
+      `admin/system/payment-setting/verify-khqr/${khqr.value}/${form.code}`
+    );
+
+    // console.log('VERIFY KHQR', response);
+
+    return response.payload;
+  } catch (error) {
+    console.error('Verify KHQR Error:', error);
+
+    // Continue polling if API temporarily fails
+    return true;
+  }
+};
+
+/**
+ * Stop polling
+ */
+const stopVerifyKHQR = () => {
+  if (verifyInterval) {
+    clearInterval(verifyInterval);
+    verifyInterval = null;
+  }
+
+  isVerifying = false;
+
+  console.log('KHQR polling stopped');
+};
+
+/**
+ * Start polling
+ */
+const startVerifyKHQR = () => {
+  // Prevent duplicate intervals
+  stopVerifyKHQR();
+
+  console.log('KHQR polling started');
+
+  verifyInterval = setInterval(async () => {
+    // Prevent concurrent requests
+    if (isVerifying) return;
+
+    try {
+      isVerifying = true;
+
+      const shouldContinuePolling = await verifyKHQR();
+
+      // Payment success
+      if (!shouldContinuePolling) {
+        stopVerifyKHQR();
+        form.status = 'Completed';
+        playSuccessSound();
+        useNotification('Payment successful');
+
+        // Optional actions
+        // await submit();
+        // await refreshData();
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isVerifying = false;
+    }
+  }, 3000);
+};
+
+/**
+ * Generate KHQR when payment method changes
+ */
+watch(
+  () => form.paymentTypeId,
+  async () => {
+    stopVerifyKHQR();
+
+    isCashed.value = true;
+    khqr.value = '';
+
+    if (!form.paymentTypeId) return;
+
+    try {
+      paymentMethodLoading.value = true;
+
+      const response = await useApi<any>(
+        'admin/system/payment-setting/generate-khqr',
+        {
+          params: {
+            id: form.paymentTypeId,
+            billNumber: form.code,
+            amount: formatAmount(totalAmount.value),
+          },
+        }
+      );
+
+      console.log('Payment response', response);
+
+      // Cash payment
+      if (response.payload.isCashed) {
+        isCashed.value = true;
+        form.status = 'Completed';
+        return;
+      }
+
+      // KHQR payment
+      isCashed.value = false;
+      khqr.value = response.payload.data.qr;
+
+      await qrCodeGenerate(khqr.value);
+
+      startVerifyKHQR();
+    } catch (error: any) {
+      useMessage(error, 'error');
+    } finally {
+      paymentMethodLoading.value = false;
+    }
+  },
+  {
+    immediate: true,
+  }
+);
+
+/**
+ * Cleanup
+ */
+onBeforeUnmount(() => {
+  stopVerifyKHQR();
+});
 </script>
 
 <style>

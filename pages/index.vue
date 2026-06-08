@@ -22,12 +22,12 @@
       <div class="rounded-md border border-slate-200 bg-white">
         <div class="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 class="text-base font-semibold text-slate-900">Sale Summary</h2>
-            <p class="mt-1 text-sm text-slate-500">Monthly sale amount and quantity</p>
+            <h2 class="text-base font-semibold text-slate-900">{{ t('dashboard.monthly_sale_graphic')}}</h2>
+            <!-- <p class="mt-1 text-sm text-slate-500">Monthly sale amount and quantity</p> -->
           </div>
           <el-button :loading="loading" @click="loadDashboard">
             <Icon name="solar:refresh-outline" size="17" />
-            <span class="ml-1">Refresh</span>
+            <span class="ml-1">{{ t('dashboard.refresh')}}</span>
           </el-button>
         </div>
 
@@ -79,8 +79,8 @@
     <div class="grid gap-5 lg:grid-cols-2">
       <div class="rounded-md border border-slate-200 bg-white">
         <div class="border-b border-slate-200 p-4">
-          <h2 class="text-base font-semibold text-slate-900">Purchase Order Status</h2>
-          <p class="mt-1 text-sm text-slate-500">Purchase orders grouped by status</p>
+          <h2 class="text-base font-semibold text-slate-900">{{ t('dashboard.purchase_order_status')}}</h2>
+          <!-- <p class="mt-1 text-sm text-slate-500">Purchase orders grouped by status</p> -->
         </div>
         <div v-loading="loading" class="h-[320px] p-4">
           <canvas ref="purchaseOrderStatusChartRef" aria-label="Purchase order status chart" />
@@ -95,8 +95,8 @@
 
       <div class="rounded-md border border-slate-200 bg-white">
         <div class="border-b border-slate-200 p-4">
-          <h2 class="text-base font-semibold text-slate-900">Sale Status</h2>
-          <p class="mt-1 text-sm text-slate-500">Sales grouped by status</p>
+          <h2 class="text-base font-semibold text-slate-900">{{ t('dashboard.sale_status')}}</h2>
+          <!-- <p class="mt-1 text-sm text-slate-500">Sales grouped by status</p> -->
         </div>
         <div v-loading="loading" class="h-[320px] p-4">
           <canvas ref="saleStatusChartRef" aria-label="Sale status chart" />
@@ -112,8 +112,8 @@
 
     <div class="rounded-md border border-slate-200 bg-white">
       <div class="border-b border-slate-200 p-4">
-        <h2 class="text-base font-semibold text-slate-900">Low Stock Movement</h2>
-        <p class="mt-1 text-sm text-slate-500">Stock movement totals for products below threshold</p>
+        <h2 class="text-base font-semibold text-slate-900">{{ t('dashboard.low_stock_movement')}}</h2>
+        <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.stock_movement_totals_for_products_below_threshold')}} </p>
       </div>
 
       <el-table
@@ -215,6 +215,10 @@ type DashboardResponse = DashboardPayload | {
 
 definePageMeta({
   title: 'Dashboard',
+})
+
+useSeoMeta({
+  title: 'MINI POS - Dashboard',
 })
 
 Chart.register(ArcElement, BarController, BarElement, CategoryScale, DoughnutController, LinearScale, Tooltip, Legend)

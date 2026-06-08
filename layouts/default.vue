@@ -98,8 +98,19 @@
           v-model="selectedLocale"
           :options="languageOptions"
           size="small"
-          class="hidden sm:flex"
-        />
+          class="language-switcher hidden sm:flex"
+        >
+          <template #default="{ item }">
+            <span class="language-switcher__option">
+              <Icon
+                :name="item.flag"
+                class="language-switcher__flag"
+                aria-hidden="true"
+              />
+              <span class="language-switcher__label">{{ item.label }}</span>
+            </span>
+          </template>
+        </el-segmented>
         <el-button text circle>
           <Icon name="solar:bell-outline" size="20" />
         </el-button>
@@ -404,8 +415,8 @@ const otpForm = reactive({
 })
 
 const languageOptions = [
-  { label: 'English', value: 'en' },
-  { label: 'ខ្មែរ', value: 'km' },
+  { label: 'English', value: 'en', flag: 'circle-flags:us' },
+  { label: 'ខ្មែរ', value: 'km', flag: 'circle-flags:kh' },
 ]
 
 const menuItems = [
@@ -732,3 +743,58 @@ const handleUserCommand = async (command: string) => {
   }
 }
 </script>
+
+<style scoped>
+.language-switcher {
+  --el-segmented-bg-color: #f8fafc;
+  --el-segmented-item-hover-bg-color: #eef2f7;
+  --el-segmented-item-selected-bg-color: #f59e0b;
+  --el-segmented-item-selected-color: #ffffff;
+  --el-segmented-item-selected-disabled-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.language-switcher :deep(.el-segmented__group) {
+  align-items: center;
+  gap: 2px;
+}
+
+.language-switcher :deep(.el-segmented__item) {
+  min-width: 96px;
+  height: 25px;
+  border-radius: 6px;
+  padding: 0 10px;
+}
+
+.language-switcher :deep(.el-segmented__item-label) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.language-switcher__option {
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.language-switcher__flag {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 1px rgb(15 23 42 / 8%);
+}
+
+.language-switcher__label {
+  min-width: 0;
+}
+</style>

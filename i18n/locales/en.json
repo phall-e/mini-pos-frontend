@@ -84,7 +84,14 @@
         "product_updated": "Product updated successfully",
         "product_deleted": "Product deleted successfully",
         "delete_product": "Delete Product",
-        "confirm_delete_product": "Do you want to delete {name}?"
+        "confirm_delete_product": "Do you want to delete {name}?",
+        "monthly_sale_graphic": "Monthly sale graphic",
+        "refresh": "Refresh",
+        "purchase_order_status": "Purchase order Status",
+        "sale_status": "Sale status",
+        "low_stock_movement": "Low stock movement",
+        "stock_movement_totals_for_products_below_threshold": "Stock movement totals for products below threshold"
+
     },
     "uom": {
         "title": "Unit of Measure",

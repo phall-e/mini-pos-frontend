@@ -17,10 +17,6 @@
         <p class="text-gray-500 mt-2">
           We've sent a verification code to
         </p>
-
-        <p class="font-medium text-gray-700">
-          {{ useOtp.username }}
-        </p>
       </div>
 
       <div class="flex justify-center gap-3 mb-6">

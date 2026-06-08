@@ -84,7 +84,13 @@
         "product_updated": "បានកែប្រែផលិតផលដោយជោគជ័យ",
         "product_deleted": "បានលុបផលិតផលដោយជោគជ័យ",
         "delete_product": "លុបផលិតផល",
-        "confirm_delete_product": "តើអ្នកចង់លុប {name} ឬ?"
+        "confirm_delete_product": "តើអ្នកចង់លុប {name} ឬ?",
+        "monthly_sale_graphic": "ទិន្នន័យការលក់ប្រចាំខែជាក្រាហ្វិច",
+        "refresh": "ផ្ទុកឡើងវិញ",
+        "purchase_order_status": "ទិន្នន័យការបញ្ជាទិញតាមស្ថានភាព",
+        "sale_status": "ទិន្នន័យការលក់តាមស្ថានភាព",
+        "low_stock_movement": "ស្តុកទំនិញដែលមានចំនួនទាប់",
+        "stock_movement_totals_for_products_below_threshold": "សរុបចលនាស្តុកសម្រាប់ផលិតផលក្រោមកម្រិតកំណត់"
     },
     "uom": {
         "title": "ឯកតារង្វាស់",

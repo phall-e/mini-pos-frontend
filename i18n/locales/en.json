@@ -442,6 +442,28 @@
         "save_failed": "Failed to save payment setting",
         "delete_failed": "Failed to delete payment setting"
     },
+    "telegram_setting": {
+        "name": "Name",
+        "telegram_chat_id": "Telegram Chat ID",
+        "slug": "Slug",
+        "status": "Status",
+        "title": "Telegram Setting",
+        "description": "Manage telegram group for sending message.",
+        "search_placeholder": "Search telegram setting...",
+        "create_title": "Create Telegram Setting",
+        "edit_title": "Edit Telegram Setting",
+        "delete_title": "Delete Telegram Setting",
+        "confirm_delete": "Do you want to delete telegram setting for {name}?",
+        "name_required": "Name is required",
+        "telegram_chat_id_required": "Telegram chat id is required",
+        "slug_required": "Slug is required",
+        "created": "Telegram setting created successfully",
+        "updated": "Telegram setting updated successfully",
+        "deleted": "Telegram setting deleted successfully",
+        "load_failed": "Failed to load telegram setting data",
+        "save_failed": "Failed to save telegram setting",
+        "delete_failed": "Failed to delete telegram setting"
+    },  
     "menu": {
         "dashboard": "Dashboard",
         "system": "System",
@@ -472,6 +494,7 @@
         "sale": "Sale",
         "sale_payment_receipt": "Sale Payment Receipt",
         "purchase_receipt_billing": "Purchase Receipt Billing",
+        "telegram_setting": "Telegram setting",        
 
         "building": "Building",
         "floor": "Floor",

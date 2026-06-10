@@ -157,7 +157,6 @@
           @current-change="loadItems"
         />
       </div>
-      <pre>{{ authStore.users?.permissions }}</pre>
     </div>
 
     <el-dialog
@@ -244,9 +243,11 @@ definePageMeta({
   permission: 'telegram-read'
 })
 
-const { can } = usePermission();
+useHead({
+  title: 'MINI-POS-TELEGRAM-SETTING'
+})
 
-const authStore = useAuthStore();
+const { can } = usePermission();
 
 
 interface TelegramSetting {

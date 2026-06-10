@@ -20,7 +20,7 @@
               <Icon name="solar:magnifer-outline" />
             </template>
           </el-input>
-          <el-button type="primary" @click="openCreateDialog">
+          <el-button v-if="can('product-create')" type="primary" @click="openCreateDialog">
             <Icon name="solar:add-circle-outline" size="18" />
             <span class="ml-1">{{ t('create') }}</span>
           </el-button>
@@ -79,12 +79,12 @@
         <el-table-column :label="t('columns.action')" fixed="right" width="140" align="center">
           <template #default="{ row }">
             <div class="flex items-center justify-center gap-2">
-              <el-tooltip :content="t('edit')" placement="top">
+              <el-tooltip v-if="can('product-delete')" :content="t('edit')" placement="top">
                 <el-button type="success" circle @click="openEditDialog(row)">
                   <Icon name="solar:pen-2-outline" size="17" />
                 </el-button>
               </el-tooltip>
-              <el-tooltip :content="t('delete')" placement="top">
+              <el-tooltip v-if="can('product-delete')" :content="t('delete')" placement="top">
                 <el-button type="danger" circle @click="deleteItem(row)">
                   <Icon name="solar:trash-bin-trash-outline" size="17" />
                 </el-button>
@@ -235,6 +235,16 @@
 <script setup lang="ts">
 import type { FormInstance, FormRules } from 'element-plus'
 import SingleUpload from '~/@core/components/SingleUpload.vue'
+
+definePageMeta({
+  permission: 'product-read'
+})
+
+useHead({
+  title: 'MINI-POS-PRODUCT'
+})
+
+const { can } = usePermission();
 
 interface SelectOption {
   id: number

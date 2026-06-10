@@ -381,6 +381,7 @@
         "email": "Email",
         "telegram_chat_id": "Telegram Chat ID",
         "roles": "Roles",
+        "is_required_otp": "Is required OTP",
         "select_roles": "Select roles",
         "confirm_password": "Confirm Password",
         "username_required": "Username is required",

@@ -380,6 +380,7 @@
         "email": "អ៊ីមែល",
         "telegram_chat_id": "លេខសម្គាល់ Telegram Chat",
         "roles": "តួនាទី",
+        "is_required_otp": "ទាមទារការផ្ទៀងផ្ទាត់",
         "select_roles": "ជ្រើសរើសតួនាទី",
         "confirm_password": "បញ្ជាក់ពាក្យសម្ងាត់",
         "username_required": "ត្រូវបញ្ចូលឈ្មោះអ្នកប្រើប្រាស់",

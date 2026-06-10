@@ -38,6 +38,15 @@
         <el-table-column prop="username" :label="t('username')" min-width="180" />
         <el-table-column prop="email" :label="t('user.email')" min-width="220" />
         <el-table-column prop="telegramChatId" :label="t('user.telegram_chat_id')" min-width="250" />
+        <el-table-column :label="t('user.is_required_otp')" width="150" align="center">
+          <template #default="{ row }">
+            <el-checkbox
+              v-if="row.isRequiredOtp"
+              :model-value="true"
+              disabled
+            />
+          </template>
+        </el-table-column>
         <el-table-column :label="t('columns.is_admin')" width="120" align="center">
           <template #default="{ row }">
             <el-checkbox
@@ -171,41 +180,47 @@
           </el-form-item>
         </div>
 
-        <el-form-item :label="t('user.roles')" prop="roles">
-          <el-select
-            v-model="form.roles"
-            multiple
-            filterable
-            collapse-tags
-            collapse-tags-tooltip
-            :max-collapse-tags="3"
-            :loading="roleLoading"
-            :placeholder="t('user.select_roles')"
-            :teleported="false"
-            class="w-full"
-          >
-            <el-option
-              v-for="role in roleOptions"
-              :key="role.id"
-              :label="role.name"
-              :value="role.id"
+        <div class="grid gap-4 sm:grid-cols-2">
+          <el-form-item :label="t('user.roles')" prop="roles">
+            <el-select
+              v-model="form.roles"
+              multiple
+              filterable
+              collapse-tags
+              collapse-tags-tooltip
+              :max-collapse-tags="3"
+              :loading="roleLoading"
+              :placeholder="t('user.select_roles')"
+              :teleported="false"
+              class="w-full"
+            >
+              <el-option
+                v-for="role in roleOptions"
+                :key="role.id"
+                :label="role.name"
+                :value="role.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="t('user.is_required_otp')" prop="isRequiredOtp">
+            <el-switch
+              v-model="form.isRequiredOtp"
+              :active-text="t('user.is_required_otp')"
             />
-          </el-select>
-        </el-form-item>
+          </el-form-item>
+        </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <el-form-item :label="t('columns.is_active')" prop="isActive">
             <el-switch
               v-model="form.isActive"
               :active-text="t('active')"
-              :inactive-text="t('inactive')"
             />
           </el-form-item>
           <el-form-item :label="t('columns.is_admin')" prop="isAdmin">
             <el-switch
               v-model="form.isAdmin"
               :active-text="t('active')"
-              :inactive-text="t('inactive')"
             />
           </el-form-item>
         </div>
@@ -249,6 +264,7 @@ interface User {
   username: string
   email: string
   telegramChatId?: string | null
+  isRequiredOtp: boolean
   isActive: boolean
   isAdmin: boolean
   role?: RoleOption[] | number[]
@@ -309,6 +325,7 @@ const emptyForm = () => ({
   telegramChatId: '',
   password: '',
   confirmPassword: '',
+  isRequiredOtp: true,
   isActive: true,
   isAdmin: false,
   roles: [] as number[],
@@ -499,6 +516,7 @@ const submit = async () => {
     username: string
     email: string
     telegramChatId: string
+    isRequiredotp: boolean
     isActive: boolean
     isAdmin: boolean
     roles: number[]
@@ -508,6 +526,7 @@ const submit = async () => {
     username: form.username,
     email: form.email,
     telegramChatId: form.telegramChatId,
+    isRequiredotp: form.isRequiredOtp,
     isActive: form.isActive,
     isAdmin: form.isAdmin,
     roles: form.roles,

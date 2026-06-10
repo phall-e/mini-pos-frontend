@@ -18,19 +18,12 @@ interface Token {
   tokenType: string
 }
 
-interface LoginResponse {
-  payload: {
-    success: boolean
-    username: string
-    status: number
-    message: string
-  }
-}
 
 interface VerifyOtpResponse {
   payload: {
     users: User
     token: Token
+    isRequiredOtp: boolean
   }
 }
 
@@ -64,19 +57,25 @@ export const useAuthStore = defineStore('auth', () => {
 
   const login = async (payload: { username: string; password: string }) => {
     try {
-      const response = await useApi<LoginResponse>('auth/login', {
+      const response = await useApi<any>('auth/login', {
         method: 'post',
         body: payload,
       })
-
       const otpStore = useOtpStore()
 
-      if (response.payload.status) {
-        otpStore.isOptSent = true
-        otpStore.username = response.payload.username
-        useNotification(response.payload.message || 'OTP sent successfully')
-        await navigateTo('/auth/otp-verify')
+      if (response.payload.isRequiredOtp) {
+        otpStore.isOptSent = true;
+        otpStore.username = response.payload.username;
+
+        useNotification(
+          response.payload.message || 'OTP sent successfully',
+        );
+
+        await navigateTo('/auth/otp-verify');
+      } else {
+        await setAuthentication(response);
       }
+
     } catch (error) {
       useMessage(getErrorMessage(error, 'Login failed'), 'error')
       throw error
@@ -114,20 +113,24 @@ export const useAuthStore = defineStore('auth', () => {
         throw new Error('Invalid OTP verification response')
       }
 
-      token.value = accessToken
-      users.value = response.payload.users
-      user.value = response.payload.users
-
-      const otpStore = useOtpStore()
-      otpStore.isOptSent = false
-      otpStore.username = ''
-
-      useNotification('OTP verified successfully')
-      await navigateTo('/')
+      await setAuthentication(response);
     } catch (error) {
       useMessage(getErrorMessage(error, 'OTP verification failed'), 'error')
       throw error
     }
+  }
+
+  const setAuthentication = async(payload: VerifyOtpResponse) => {
+    token.value = payload.payload.token.accessToken,
+    users.value = payload.payload.users
+    user.value = payload.payload.users
+
+    const otpStore = useOtpStore()
+    otpStore.isOptSent = false
+    otpStore.username = ''
+
+    useNotification('OTP verified successfully')
+    await navigateTo('/')
   }
 
   const logout = async () => {
@@ -155,3 +158,6 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
   }
 })
+
+
+

@@ -65,7 +65,7 @@ const otp = ref(['', '', '', '', '', ''])
 
 const otpRefs = ref<HTMLInputElement[]>([])
 
-const handleInput = (index: number) => {
+const handleInput = async(index: number) => {
   const value = otp.value[index]
 
   if (!/^\d$/.test(value)) {
@@ -75,6 +75,11 @@ const handleInput = (index: number) => {
 
   if (index < 5) {
     otpRefs.value[index + 1]?.focus()
+  }
+
+  const code = otp.value.join('')
+  if (code.length === 6 && /^\d{6}$/.test(code) && !loading.value) {
+    await verifyOtp()
   }
 }
 

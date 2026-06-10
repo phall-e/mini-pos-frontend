@@ -595,11 +595,6 @@ const filteredMenus = computed(() =>
   filterMenus(menuItems),
 );
 
-watchEffect(() => {
-  console.log('user', authStore.user);
-  console.log('menus', filteredMenus.value);
-});
-
 
 watch(selectedLocale, async (value) => {
   await setLocale(value)

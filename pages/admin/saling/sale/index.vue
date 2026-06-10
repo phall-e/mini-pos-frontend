@@ -20,7 +20,7 @@
               <Icon name="solar:magnifer-outline" />
             </template>
           </el-input>
-          <el-button type="primary" @click="openCreateDialog">
+          <el-button v-if="can('sale-create')" type="primary" @click="openCreateDialog">
             <Icon name="solar:add-circle-outline" size="18" />
             <span class="ml-1">{{ t('create') }}</span>
           </el-button>
@@ -78,12 +78,12 @@
                   <Icon v-if="printLoadingId !== row.id" name="fluent:print-20-regular" size="17" />
                 </el-button>
               </el-tooltip>
-              <el-tooltip :content="t('edit')" placement="top">
+              <el-tooltip v-if="can('sale-edit')" :content="t('edit')" placement="top">
                 <el-button type="success" circle @click="openEditDialog(row)">
                   <Icon name="solar:pen-2-outline" size="17" />
                 </el-button>
               </el-tooltip>
-              <el-tooltip :content="t('delete')" placement="top">
+              <el-tooltip v-if="can('sale-delete')" :content="t('delete')" placement="top">
                 <el-button type="danger" circle @click="deleteItem(row)">
                   <Icon name="solar:trash-bin-trash-outline" size="17" />
                 </el-button>
@@ -633,6 +633,16 @@ import type { FormInstance, FormRules } from 'element-plus'
 import DropZone from '~/@core/components/DropZone.vue'
 import logoUrl from '~/assets/images/logo/logo.png'
 import QRCode from "qrcode";
+
+definePageMeta({
+  permission: 'sale-read'
+})
+
+useHead({
+  title: 'MINI-POS-SALE'
+})
+
+const { can } = usePermission();
 
 type SaleStatus = 'Pending' | 'Cancelled' | 'Completed'
 

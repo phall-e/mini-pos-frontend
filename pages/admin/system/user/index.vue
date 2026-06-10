@@ -40,19 +40,21 @@
         <el-table-column prop="telegramChatId" :label="t('user.telegram_chat_id')" min-width="250" />
         <el-table-column :label="t('user.is_required_otp')" width="150" align="center">
           <template #default="{ row }">
-            <el-checkbox
-              v-if="row.isRequiredOtp"
-              :model-value="true"
-              disabled
+            <Icon
+              v-if="row.isRequiredOtp" 
+              :size="30"
+              name="bitcoin-icons:verify-filled"
+              class="text-green-500"
             />
           </template>
         </el-table-column>
         <el-table-column :label="t('columns.is_admin')" width="120" align="center">
           <template #default="{ row }">
-            <el-checkbox
-              v-if="row.isAdmin"
-              :model-value="true"
-              disabled
+            <Icon
+              v-if="row.isAdmin" 
+              :size="30"
+              name="bitcoin-icons:verify-filled"
+              class="text-green-500"
             />
           </template>
         </el-table-column>

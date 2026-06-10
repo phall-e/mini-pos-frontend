@@ -24,6 +24,7 @@
           </el-input>
 
           <el-button
+            v-if="can('telegram-create')"
             type="primary"
             @click="openCreateDialog"
           >
@@ -89,6 +90,7 @@
           <template #default="{ row }">
             <div class="flex items-center justify-center gap-2">
               <el-tooltip
+                v-if="can('telegram-edit')"
                 :content="t('edit')"
               >
                 <el-button
@@ -104,6 +106,7 @@
               </el-tooltip>
 
               <el-tooltip
+                v-if="can('telegram-delete')"
                 :content="t('delete')"
               >
                 <el-button
@@ -154,6 +157,7 @@
           @current-change="loadItems"
         />
       </div>
+      <pre>{{ authStore.users?.permissions }}</pre>
     </div>
 
     <el-dialog
@@ -235,6 +239,14 @@ import type {
 } from 'element-plus'
 
 import { useDebounceFn } from '@vueuse/core'
+
+definePageMeta({
+  permission: 'telegram-read'
+})
+
+const authStore = useAuthStore();
+const { can } = usePermission();
+
 
 interface TelegramSetting {
   id: number

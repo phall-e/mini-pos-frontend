@@ -26,6 +26,9 @@ export const useApi = async <T>(
     if (authOnly && error?.status === 401) {
     //   await auth.logout()
     }
+    if (authOnly && error?.status === 403) {
+      navigateTo('/403');
+    }
     throw error
   }
 }

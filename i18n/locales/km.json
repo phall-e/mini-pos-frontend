@@ -45,6 +45,8 @@
     "scanning": "ស្កែន",
     "admin_console": "ផ្ទាំងគ្រប់គ្រង",
     "administrator": "អ្នកគ្រប់គ្រង",
+    "you_do_not_have_permission_to_access_this_page": "អ្នកមិនមានសិទ្ធិចូលប្រើទំព័រនេះទេ។",
+    "back_dashboard": "ត្រឡប់ទៅផ្ទាំងគ្រប់គ្រង",
     "profile": {
         "edit_information": "កែប្រែព័ត៌មានអ្នកប្រើប្រាស់",
         "verify_otp": "ផ្ទៀងផ្ទាត់ OTP",

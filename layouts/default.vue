@@ -25,7 +25,7 @@
           router
         >
           <template
-            v-for="item in menuItems"
+            v-for="item in filteredMenus"
             :key="item.index"
           >
             <el-menu-item
@@ -337,7 +337,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance, FormRules } from 'element-plus';
 
 interface RoleOption {
   id: number
@@ -419,7 +419,22 @@ const languageOptions = [
   { label: 'ខ្មែរ', value: 'km', flag: 'circle-flags:kh' },
 ]
 
-const menuItems = [
+interface MenuChild {
+  index: string;
+  label: string;
+  icon: string;
+  permission?: string | null;
+}
+
+interface MenuItem {
+  index: string;
+  label: string;
+  icon: string;
+  permission?: string | null;
+  children?: MenuChild[];
+}
+
+const menuItems: MenuItem[] = [
   {
     index: '/',
     label: 'menu.dashboard',
@@ -430,11 +445,36 @@ const menuItems = [
     label: 'menu.master_data',
     icon: 'solar:database-outline',
     children: [
-      { index: '/admin/master-data/uom/', label: 'menu.uom', icon: 'solar:ruler-angular-outline' },
-      { index: '/admin/master-data/products/', label: 'menu.product', icon: 'solar:box-outline' },
-      { index: '/admin/master-data/categories/', label: 'menu.category', icon: 'solar:folder-with-files-outline' },
-      { index: '/admin/master-data/vendor/', label: 'menu.vendor', icon: 'solar:delivery-outline' },
-      { index: '/admin/master-data/customer/', label: 'menu.customer', icon: 'solar:users-group-rounded-outline' },
+      { 
+        index: '/admin/master-data/uom/', 
+        label: 'menu.uom', 
+        icon: 'solar:ruler-angular-outline',
+        permission: 'uom-read', 
+      },
+      { 
+        index: '/admin/master-data/products/', 
+        label: 'menu.product', 
+        icon: 'solar:box-outline',
+        permission: 'product-read',  
+      },
+      { 
+        index: '/admin/master-data/categories/', 
+        label: 'menu.category', 
+        icon: 'solar:folder-with-files-outline',
+        permission: 'category-read',  
+      },
+      { 
+        index: '/admin/master-data/vendor/', 
+        label: 'menu.vendor', 
+        icon: 'solar:delivery-outline',
+        permission: 'vendor-read',  
+      },
+      { 
+        index: '/admin/master-data/customer/', 
+        label: 'menu.customer', 
+        icon: 'solar:users-group-rounded-outline',
+        permission: 'customer-read',  
+      },
     ],
   },
   {
@@ -442,7 +482,12 @@ const menuItems = [
     label: 'menu.purchasing',
     icon: 'solar:cart-large-minimalistic-outline',
     children: [
-      { index: '/admin/purchasing/purchase-order/', label: 'menu.purchase_order', icon: 'solar:clipboard-list-outline' },
+      { 
+        index: '/admin/purchasing/purchase-order/', 
+        label: 'menu.purchase_order', 
+        icon: 'solar:clipboard-list-outline',
+        permission: 'purchase-order-read',  
+      },
     ],
   },
   {
@@ -450,9 +495,24 @@ const menuItems = [
     label: 'menu.stocking',
     icon: 'solar:box-minimalistic-outline',
     children: [
-      { index: '/admin/stocking/stock/', label: 'menu.stock', icon: 'solar:box-outline' },
-      { index: '/admin/stocking/stock-in/', label: 'menu.stock_in', icon: 'solar:inbox-in-outline' },
-      { index: '/admin/stocking/stock-adjustment/', label: 'menu.stock_adjustment', icon: 'solar:tuning-square-outline' },
+      { 
+        index: '/admin/stocking/stock/', 
+        label: 'menu.stock', 
+        icon: 'solar:box-outline',
+        permission: 'stock-read',  
+      },
+      { 
+        index: '/admin/stocking/stock-in/', 
+        label: 'menu.stock_in', 
+        icon: 'solar:inbox-in-outline',
+        permission: 'stock-in-read',  
+      },
+      { 
+        index: '/admin/stocking/stock-adjustment/', 
+        label: 'menu.stock_adjustment',
+        icon: 'solar:tuning-square-outline',
+        permission: 'stock-adjustment-read',  
+      },
     ],
   },
   {
@@ -460,7 +520,12 @@ const menuItems = [
     label: 'menu.saling',
     icon: 'solar:cart-large-2-outline',
     children: [
-      { index: '/admin/saling/sale/', label: 'menu.sale', icon: 'solar:bill-list-outline' },
+      { 
+        index: '/admin/saling/sale/', 
+        label: 'menu.sale', 
+        icon: 'solar:bill-list-outline',
+        permission: 'sale-read',  
+      },
     ],
   },
   {
@@ -468,13 +533,73 @@ const menuItems = [
     label: 'menu.system',
     icon: 'solar:settings-outline',
     children: [
-      { index: '/admin/system/user/', label: 'menu.user', icon: 'solar:user-id-outline' },
-      { index: '/admin/system/role/', label: 'menu.role', icon: 'solar:shield-user-outline' },
-      { index: '/admin/system/payment-setting/', label: 'menu.payment_setting', icon: 'solar:card-2-outline' },
-      { index: '/admin/system/telegram-setting/', label: 'menu.telegram_setting', icon: 'mage:notification-bell' },
+      { 
+        index: '/admin/system/user/', 
+        label: 'menu.user', 
+        icon: 'solar:user-id-outline',
+        permission: 'user-read',  
+      },
+      { 
+        index: '/admin/system/role/', 
+        label: 'menu.role', 
+        icon: 'solar:shield-user-outline',
+        permission: 'role-read',  
+      },
+      { 
+        index: '/admin/system/payment-setting/', 
+        label: 'menu.payment_setting', 
+        icon: 'solar:card-2-outline',
+        permission: 'payment-setting-read',  
+      },
+      { 
+        index: '/admin/system/telegram-setting/', 
+        label: 'menu.telegram_setting', 
+        icon: 'mage:notification-bell',
+        permission: 'telegram-read',  
+      },
     ],
   },
 ]
+
+const { can } = usePermission();
+const filterMenus = (menus: MenuItem[]): MenuItem[] => {
+  return menus.reduce<MenuItem[]>((result, menu) => {
+    // Parent permission check
+    if (menu.permission && !can(menu.permission)) {
+      return result;
+    }
+
+    // No children
+    if (!menu.children?.length) {
+      result.push(menu);
+      return result;
+    }
+
+    const children = menu.children.filter(
+      (child) =>
+        !child.permission || can(child.permission),
+    );
+
+    if (children.length) {
+      result.push({
+        ...menu,
+        children,
+      });
+    }
+
+    return result;
+  }, []);
+};
+
+const filteredMenus = computed(() =>
+  filterMenus(menuItems),
+);
+
+watchEffect(() => {
+  console.log('user', authStore.user);
+  console.log('menus', filteredMenus.value);
+});
+
 
 watch(selectedLocale, async (value) => {
   await setLocale(value)

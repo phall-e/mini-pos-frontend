@@ -45,6 +45,8 @@
     "scanning": "Scanning",
     "admin_console": "Admin Console",
     "administrator": "Administrator",
+    "you_do_not_have_permission_to_access_this_page": "You don't have permission to access this page.",
+    "back_dashboard": "Back Dashboard",
     "profile": {
         "edit_information": "Edit User Information",
         "verify_otp": "Verify OTP",

@@ -79,7 +79,7 @@
         <el-table-column :label="t('columns.action')" fixed="right" width="140" align="center">
           <template #default="{ row }">
             <div class="flex items-center justify-center gap-2">
-              <el-tooltip v-if="can('product-delete')" :content="t('edit')" placement="top">
+              <el-tooltip v-if="can('product-edit')" :content="t('edit')" placement="top">
                 <el-button type="success" circle @click="openEditDialog(row)">
                   <Icon name="solar:pen-2-outline" size="17" />
                 </el-button>

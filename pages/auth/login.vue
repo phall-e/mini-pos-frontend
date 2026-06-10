@@ -77,7 +77,7 @@
   }
 
   const formData = ref<FormData>({
-    username: 'admin',
+    username: 'guest',
     password: '123',
   });
 

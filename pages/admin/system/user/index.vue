@@ -435,6 +435,7 @@ const resetForm = (value: Partial<User> = {}) => {
   form.telegramChatId = value.telegramChatId ?? ''
   form.password = ''
   form.confirmPassword = ''
+  form.isRequiredOtp = value.isRequiredOtp ?? true
   form.isActive = value.isActive ?? true
   form.isAdmin = value.isAdmin ?? false
   form.roles = normalizeRoleIds(value)
@@ -516,7 +517,7 @@ const submit = async () => {
     username: string
     email: string
     telegramChatId: string
-    isRequiredotp: boolean
+    isRequiredOtp: boolean
     isActive: boolean
     isAdmin: boolean
     roles: number[]
@@ -526,7 +527,7 @@ const submit = async () => {
     username: form.username,
     email: form.email,
     telegramChatId: form.telegramChatId,
-    isRequiredotp: form.isRequiredOtp,
+    isRequiredOtp: form.isRequiredOtp,
     isActive: form.isActive,
     isAdmin: form.isAdmin,
     roles: form.roles,

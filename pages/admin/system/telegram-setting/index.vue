@@ -244,8 +244,9 @@ definePageMeta({
   permission: 'telegram-read'
 })
 
-const authStore = useAuthStore();
 const { can } = usePermission();
+
+const authStore = useAuthStore();
 
 
 interface TelegramSetting {

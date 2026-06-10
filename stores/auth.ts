@@ -128,8 +128,6 @@ export const useAuthStore = defineStore('auth', () => {
     const otpStore = useOtpStore()
     otpStore.isOptSent = false
     otpStore.username = ''
-
-    useNotification('OTP verified successfully')
     await navigateTo('/')
   }
 

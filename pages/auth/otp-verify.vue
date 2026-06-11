@@ -37,6 +37,7 @@
         type="primary"
         size="large"
         class="w-full"
+        :disabled="otp.length >= 6"
         :loading="loading"
         @click="verifyOtp"
       >

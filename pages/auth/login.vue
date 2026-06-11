@@ -1,9 +1,10 @@
 <template>
-  <div class="w-full h-screen flex items-start justify-between">
+  <div class="w-full h-screen flex items-start justify-between overflow-hidden">
     <div class="hidden md:block md:w-[75%] h-screen">
-      <img
+      <el-image
         class="h-full w-full object-cover"
-        src="~/assets/images/login/login-bg.png" alt="Login">
+        fit="cover"
+        :src="thumbnail" alt="Login"/>
     </div>
     <div class="w-[100%] md:w-[25%] h-screen flex items-center justify-center">
       <el-form
@@ -11,11 +12,13 @@
         @submit.prevent="handleLogin"
         class="px-4 w-full"
       >
-        <img 
-          src="~/assets/images/logo/logo.png" 
-          alt=""
-          class="h-[90px] mx-auto mb-5"
-        >
+        <div class="w-full flex items-center justify-center mb-4">
+          <el-image 
+            :src="logo" 
+            alt=""
+            class="h-[80px]"
+          />
+        </div>
         <el-form-item
           label="ឈ្មោះអ្នកប្រើប្រាស់"
         >
@@ -63,6 +66,8 @@
 </template>
 
 <script setup lang="ts">
+  import thumbnail from '~/assets/images/login/login-bg.png';
+  import logo from '~/assets/images/logo/logo.png';
   definePageMeta({
       layout: 'auth',
   });

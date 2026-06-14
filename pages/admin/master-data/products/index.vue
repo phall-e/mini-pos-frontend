@@ -49,6 +49,31 @@
           </template>
         </el-table-column>
         <el-table-column prop="code" :label="t('columns.code')" min-width="140" />
+        <el-table-column :label="t('columns.barcode')" min-width="180" align="center">
+          <template #default="{ row }">
+            <div class="mx-auto w-[150px]">
+              <svg
+                :viewBox="`0 0 ${createCode39Barcode(row.code).width} ${createCode39Barcode(row.code).height}`"
+                class="h-10 w-full"
+                preserveAspectRatio="none"
+                role="img"
+                :aria-label="`${t('columns.barcode')} ${row.code}`"
+              >
+                <rect width="100%" height="100%" fill="#ffffff" />
+                <rect
+                  v-for="bar in createCode39Barcode(row.code).bars"
+                  :key="`${row.id}-${bar.x}`"
+                  :x="bar.x"
+                  y="0"
+                  :width="bar.width"
+                  :height="createCode39Barcode(row.code).height"
+                  fill="#111827"
+                />
+              </svg>
+              <p class="mt-1 truncate text-[11px] font-medium tracking-normal text-slate-700">{{ row.code }}</p>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="nameEn" :label="t('columns.name_en')" min-width="220" />
         <el-table-column prop="nameKh" :label="t('columns.name_kh')" min-width="220" />
         <el-table-column :label="t('menu.category')" min-width="180">
@@ -81,9 +106,14 @@
             {{ displayCreatedAt(row.createdAt) }}
           </template>
         </el-table-column>
-        <el-table-column :label="t('columns.action')" fixed="right" width="140" align="center">
+        <el-table-column :label="t('columns.action')" fixed="right" width="180" align="center">
           <template #default="{ row }">
             <div class="flex items-center justify-center gap-2">
+              <el-tooltip :content="t('print_barcode')" placement="top">
+                <el-button type="primary" circle @click="printBarcode(row)">
+                  <Icon name="fluent:print-20-regular" size="17" />
+                </el-button>
+              </el-tooltip>
               <el-tooltip v-if="can('product-edit')" :content="t('edit')" placement="top">
                 <el-button type="success" circle @click="openEditDialog(row)">
                   <Icon name="solar:pen-2-outline" size="17" />
@@ -244,6 +274,37 @@
         </el-button>
       </template>
     </el-dialog>
+
+    <div v-if="barcodePrintItem" class="product-barcode-print-root fixed inset-0 z-50 hidden bg-white print:block">
+      <div class="mx-auto flex min-h-screen max-w-[420px] items-center justify-center bg-white p-8 text-slate-900">
+        <div class="w-full rounded border border-slate-300 p-6 text-center">
+          <p class="text-xs font-semibold uppercase tracking-normal text-slate-500">{{ t('product.title') }}</p>
+          <h1 class="mt-2 text-lg font-bold tracking-normal">{{ barcodePrintItem.nameEn || barcodePrintItem.nameKh }}</h1>
+          <p class="mt-1 text-sm text-slate-500">{{ barcodePrintItem.code }}</p>
+
+          <svg
+            :viewBox="`0 0 ${createCode39Barcode(barcodePrintItem.code).width} ${createCode39Barcode(barcodePrintItem.code).height}`"
+            class="mt-6 h-24 w-full"
+            preserveAspectRatio="none"
+            role="img"
+            :aria-label="`${t('columns.barcode')} ${barcodePrintItem.code}`"
+          >
+            <rect width="100%" height="100%" fill="#ffffff" />
+            <rect
+              v-for="bar in createCode39Barcode(barcodePrintItem.code).bars"
+              :key="`print-${bar.x}`"
+              :x="bar.x"
+              y="0"
+              :width="bar.width"
+              :height="createCode39Barcode(barcodePrintItem.code).height"
+              fill="#111827"
+            />
+          </svg>
+          <p class="mt-3 text-base font-semibold tracking-[0.2em]">{{ createCode39Barcode(barcodePrintItem.code).value }}</p>
+          <p class="mt-2 text-sm text-slate-600">{{ formatPrice(barcodePrintItem.unitPrice) }}</p>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -360,6 +421,7 @@ const pageSizes = [10, 20, 50, 100]
 
 const { t, locale } = useI18n()
 const breadcrumbStore = useBreadcrumbStore()
+const { createCode39Barcode } = useBarcode()
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -383,6 +445,7 @@ const params = reactive({
 const formRef = ref<FormInstance>()
 const dialogVisible = ref(false)
 const editingItem = ref<Product | null>(null)
+const barcodePrintItem = ref<Product | null>(null)
 
 const emptyForm = () => ({
   categoryId: undefined as number | undefined,
@@ -775,8 +838,48 @@ const deleteItem = async (item: Product) => {
   }
 }
 
+const printBarcode = async (item: Product) => {
+  barcodePrintItem.value = item
+  await nextTick()
+  window.print()
+}
+
+const clearBarcodePrintItem = () => {
+  barcodePrintItem.value = null
+}
+
 onMounted(() => {
   loadItems()
   loadSelectOptions()
+  window.addEventListener('afterprint', clearBarcodePrintItem)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('afterprint', clearBarcodePrintItem)
 })
 </script>
+
+<style>
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .product-barcode-print-root,
+  .product-barcode-print-root * {
+    visibility: visible;
+  }
+
+  .product-barcode-print-root {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    background: #ffffff !important;
+  }
+}
+</style>

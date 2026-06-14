@@ -148,6 +148,7 @@
         "name_en_required": "English name is required",
         "name_kh_required": "Khmer name is required",
         "unit_price_required": "Unit price is required",
+        "discount_max": "Discount cannot be greater than unit price",
         "created": "Product created successfully",
         "updated": "Product updated successfully",
         "deleted": "Product deleted successfully",

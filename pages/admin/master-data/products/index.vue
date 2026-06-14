@@ -66,6 +66,11 @@
             {{ formatPrice(row.unitPrice) }}
           </template>
         </el-table-column>
+        <el-table-column :label="t('columns.discount')" min-width="140">
+          <template #default="{ row }">
+            {{ formatPrice(row.discount) }}
+          </template>
+        </el-table-column>
         <el-table-column :label="t('columns.created_by')" min-width="180">
           <template #default="{ row }">
             {{ displayCreatedBy(row.createdBy) }}
@@ -183,7 +188,17 @@
               v-model="form.unitPrice"
               :min="0"
               :precision="2"
-              :step="1"
+              step="any"
+              class="!w-full"
+            />
+          </el-form-item>
+          <el-form-item :label="t('columns.discount')" prop="discount">
+            <el-input-number
+              v-model="form.discount"
+              :min="0"
+              :max="form.unitPrice"
+              :precision="2"
+              step="any"
               class="!w-full"
             />
           </el-form-item>
@@ -296,6 +311,7 @@ interface Product {
   nameKh: string
   description?: string | null
   unitPrice: number
+  discount?: number
   thumbnail?: ThumbnailValue
   category?: SelectOption | string | null
   uom?: SelectOption | string | null
@@ -376,6 +392,7 @@ const emptyForm = () => ({
   nameKh: '',
   description: '',
   unitPrice: 0,
+  discount: 0,
   thumbnail: null as ThumbnailValue,
 })
 
@@ -388,7 +405,27 @@ const rules = computed<FormRules>(() => ({
   nameEn: [{ required: true, message: t('product.name_en_required'), trigger: 'blur' }],
   nameKh: [{ required: true, message: t('product.name_kh_required'), trigger: 'blur' }],
   unitPrice: [{ required: true, message: t('product.unit_price_required'), trigger: 'blur' }],
+  discount: [
+    {
+      validator: (_rule: unknown, value: number | undefined, callback: (error?: Error) => void) => {
+        if (Number(value ?? 0) > Number(form.unitPrice ?? 0)) {
+          callback(new Error(t('product.discount_max')))
+          return
+        }
+
+        callback()
+      },
+      trigger: ['blur', 'change'],
+    },
+  ],
 }))
+
+watch(
+  () => form.unitPrice,
+  () => {
+    formRef.value?.validateField('discount').catch(() => undefined)
+  },
+)
 
 watchEffect(() => {
   breadcrumbStore.setPageTitle(t('menu.product'))
@@ -587,6 +624,7 @@ const resetForm = (value: Partial<Product> = emptyForm()) => {
   form.nameKh = value.nameKh ?? ''
   form.description = value.description ?? ''
   form.unitPrice = Number(value.unitPrice ?? 0)
+  form.discount = Number(value.discount ?? 0)
   form.thumbnail = value.thumbnail ?? null
   nextTick(() => formRef.value?.clearValidate())
 }
@@ -696,6 +734,7 @@ const submit = async () => {
           nameKh: form.nameKh,
           description: form.description || null,
           unitPrice: form.unitPrice,
+          discount: form.discount,
           thumbnail: normalizeThumbnail(form.thumbnail),
         },
       },

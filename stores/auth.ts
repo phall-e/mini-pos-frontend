@@ -132,18 +132,24 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = async () => {
-    token.value = null
-    users.value = null
-    user.value = null
+    try {
+      if (token.value) {
+        await useApi('auth/logout', { method: 'post' }, false)
+      }
+    } finally {
+      token.value = null
+      users.value = null
+      user.value = null
 
-    const otpStore = useOtpStore()
-    otpStore.isOptSent = false
-    otpStore.username = ''
+      const otpStore = useOtpStore()
+      otpStore.isOptSent = false
+      otpStore.username = ''
 
-    localStorage.clear()
-    sessionStorage.clear()
+      localStorage.clear()
+      sessionStorage.clear()
 
-    await navigateTo('/auth/login')
+      await navigateTo('/auth/login')
+    }
   }
 
   return {

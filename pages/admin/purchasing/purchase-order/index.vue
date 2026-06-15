@@ -226,7 +226,7 @@
                         v-model="row.unitPrice"
                         :min="0"
                         :precision="2"
-                        :step="1"
+                        step="any"
                         class="!w-full"
                       />
                     </el-form-item>

@@ -473,6 +473,19 @@
         "save_failed": "Failed to save telegram setting",
         "delete_failed": "Failed to delete telegram setting"
     },  
+    "log_activity": {
+        "title": "Log Activity",
+        "description": "Review user activity logs across system modules.",
+        "search_placeholder": "Search log activity...",
+        "view_title": "View Log Activity",
+        "user": "User",
+        "module": "Module",
+        "action": "Action",
+        "ip_address": "IP Address",
+        "user_agent": "User Agent",
+        "updated_at": "Updated At",
+        "load_failed": "Failed to load log activity data"
+    },
     "menu": {
         "dashboard": "Dashboard",
         "system": "System",
@@ -480,6 +493,7 @@
         "user": "User",
         "role": "Role",
         "payment_setting": "Payment Setting",
+        "log_activity": "Log Activity",
         "permission": "Permission",
         "branch": "Branch",
         "category": "Category",

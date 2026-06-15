@@ -15,7 +15,7 @@ export const usePermission = () => {
             return permissions.includes(permission);
         }
 
-        return permission.some((p) => permission.includes(p));
+        return permission.some((p) => permissions.includes(p));
     };
 
     const canAll = (permissions: string[]): boolean => {

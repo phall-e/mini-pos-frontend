@@ -1,10 +1,10 @@
 <template>
   <div class="min-h-screen bg-slate-100 text-slate-800">
     <aside
-      class="fixed inset-y-0 left-0 z-40 border-r border-slate-200 bg-white transition-all duration-200"
+      class="fixed inset-y-0 left-0 z-40 flex h-screen flex-col overflow-hidden border-r border-slate-200 bg-white transition-all duration-200"
       :class="collapseStore.isCollapsed ? 'w-[72px]' : 'w-[260px]'"
     >
-      <div class="flex h-16 items-center gap-3 border-b border-slate-200 px-4">
+      <div class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200 px-4">
         <img
           src="~/assets/images/logo/logo.png"
           alt="Mini POS"
@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <el-scrollbar class="h-[calc(100vh-64px)]">
+      <el-scrollbar class="min-h-0 flex-1" height="100%">
         <el-menu
           :collapse="collapseStore.isCollapsed"
           :default-active="activeMenu"
@@ -423,14 +423,14 @@ interface MenuChild {
   index: string;
   label: string;
   icon: string;
-  permission?: string | null;
+  permission?: string | string[] | null;
 }
 
 interface MenuItem {
   index: string;
   label: string;
   icon: string;
-  permission?: string | null;
+  permission?: string | string[] | null;
   children?: MenuChild[];
 }
 
@@ -556,6 +556,12 @@ const menuItems: MenuItem[] = [
         label: 'menu.telegram_setting', 
         icon: 'mage:notification-bell',
         permission: 'telegram-read',  
+      },
+      { 
+        index: '/admin/system/log-activity/', 
+        label: 'menu.log_activity', 
+        icon: 'solar:clipboard-list-outline',
+        permission: ['log-activity-read', 'log-activities-read'],  
       },
     ],
   },
